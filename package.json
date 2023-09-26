@@ -1,0 +1,18 @@
+{
+  "name": "scratch",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/figlet": "^1.5.6",
+    "bun-types": "^1.0.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "dependencies": {
+    "figlet": "^1.6.0"
+  }
+}
