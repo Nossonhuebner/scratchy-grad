@@ -2,7 +2,7 @@ function asValue(val: number | Value) {
     return typeof val === 'number' ? new Value(val) : val;
 }
 
-enum Ops {
+export enum Ops {
     Init = '',
     Plus = '+',
     Times = 'x',
@@ -11,7 +11,7 @@ enum Ops {
     ReLU = 'ReLU',
 }
 
-class Value {
+export class Value {
     data: number;
     op: Ops;
     grad: number;
