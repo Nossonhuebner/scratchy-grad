@@ -1,11 +1,19 @@
-import { Dispatch, SetStateAction } from "react"
 import { Value } from "../util/engine"
 
-export function Nodde({node}: {node: Value, selectNode: Dispatch<SetStateAction<Value[]>>, selected: boolean}) {
+
+type Props = {
+    node: Value;
+    selectNode: (v: Value) => void;
+    selected: boolean;
+}
+export function Nodde({node, selectNode, selected}: Props) {
     return (
-        <div style={{border: '1px blue', borderRadius: "5px"}}>
+        <button style={{border: '1px solid', borderRadius: "5px", borderColor: selected ? 'red' : 'blue'}} onClick={() => selectNode(node)}>
             <div>{node.data}</div>
             <div>{node.op}</div>
-        </div>
+            {node.grad > 0 && (
+             <div style={{color: 'red'}}>{node.grad}</div>
+            )}
+        </button>
     )
 }

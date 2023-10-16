@@ -5,6 +5,7 @@ function asValue(val: number | Value) {
 export enum Ops {
     Init = '',
     Plus = '+',
+    Minus = '-',
     Times = 'x',
     Divided = '/',
     Pow = '**',
@@ -33,6 +34,10 @@ export class Value {
         }
 
         return result;
+    }
+
+    minus(other: number | Value) {
+        return this.plus(asValue(other).data * -1);
     }
 
     times(other: number | Value) {
