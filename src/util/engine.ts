@@ -2,6 +2,10 @@ function asValue(val: number | Value) {
     return typeof val === 'number' ? new Value(val) : val;
 }
 
+const uniqueId = (length=16) => {
+    return Math.ceil(Math.random() * Date.now()).toPrecision(length).toString().replace(".", "")
+  }
+
 export enum Ops {
     Init = '',
     Plus = '+',
@@ -17,16 +21,22 @@ export class Value {
     op: Ops;
     grad: number;
     _back = () => {}
+    _parents: Value[];
 
-    constructor(data: number, op: Ops = Ops.Init) {
+    id: string; //used for rendering and does not belong here at all! 
+
+    constructor(data: number, parents: Value[]=[], op: Ops = Ops.Init) {
         this.data = data;
+        this._parents = parents;
         this.op = op;
         this.grad = 0.0;
+
+        this.id = uniqueId();
     }
 
     plus(other: number | Value) {
         const x = asValue(other)
-        const result = new Value(x.data + this.data, Ops.Plus)
+        const result = new Value(x.data + this.data, [this, x], Ops.Plus)
 
         result._back = () => {
             x.grad += result.grad
@@ -42,7 +52,7 @@ export class Value {
 
     times(other: number | Value) {
         const x = asValue(other)
-        const result = new Value(x.data * this.data, Ops.Times)
+        const result = new Value(x.data * this.data, [this, x], Ops.Times)
 
         result._back = () => {
             x.grad += this.data * result.grad;
@@ -54,7 +64,7 @@ export class Value {
 
     divide(other: number | Value) {;
         const x = asValue(other)
-        const result = new Value(this.data / x.data, Ops.Divided)
+        const result = new Value(this.data / x.data, [this, x], Ops.Divided)
 
         result._back = () => {
             this.grad += (1 / x.data) * result.grad;
@@ -65,7 +75,7 @@ export class Value {
 
     pow(other: number | Value) {
         const x = asValue(other);
-        const result = new Value(this.data ** x.data, Ops.Pow);
+        const result = new Value(this.data ** x.data, [this, x], Ops.Pow);
 
         result._back = () => {
             this.grad += (x.data * (this.data ** (x.data-1))) * result.grad;
@@ -75,7 +85,7 @@ export class Value {
     }
 
     relu() {
-        const result = new Value(Math.max(this.data, 0), Ops.ReLU)
+        const result = new Value(Math.max(this.data, 0), [this], Ops.ReLU)
 
         result._back = () => {
             this.grad += Number(result.data > 0) * result.grad;
@@ -86,11 +96,22 @@ export class Value {
 
     backward() {
         this.grad = 1;
-        this._back()
+
+        const sorted = this._topologicalSortParents();
+        sorted.reverse().forEach(v => v._back())
     }
 
 
     toString() {
         return `[Value] data: ${this.data}, op: '${this.op}', grad: ${this.grad}`
+    }
+
+    _topologicalSortParents(sorted: Value[]=[], seen: Set<Value> = new Set()) {
+        if (!seen.has(this)) {
+            seen.add(this)
+        }
+        this._parents.forEach(v => v._topologicalSortParents(sorted, seen))
+        sorted.push(this)
+        return sorted;
     }
 }

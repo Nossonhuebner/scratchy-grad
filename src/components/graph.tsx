@@ -1,27 +1,59 @@
 import { useState } from "react";
-import { Nodde } from "./node";
+import { OpNode, ValueNode } from "./node";
 import { Ops, Value } from "../util/engine"
-import Xarrow, {useXarrow, Xwrapper} from 'react-xarrows';
+import Xarrow, { Xwrapper } from "react-xarrows";
+
+
 
 export function Graph() {
     const [nodes, setNodes] = useState<Value[]>([]);
     const [inputVal, setInputVal] = useState('');
     const [selectedNodes, setSelectNodes] = useState<Value[]>([]);
     const [canBackProp, setCanBackProps] = useState(false);
+    const [rows, setRows]  = useState<(Value | string)[][]>([[]])
 
     const addNode = () => {
-        const val = new Value(Number(inputVal), Ops.Init)
-        setNodes([...nodes, val])
+        const val = new Value(Number(inputVal), [], Ops.Init);
+        setNodes([...nodes, val]);
+        addToLastRow(val);
         setInputVal('')
+    }
+
+    const addToLastRow = (val: Value) => {
+        setRows([...rows.slice(0, rows.length-1), [...rows[rows.length-1], val]]);
+    }
+
+    const addRow = (newRow: (Value | string)[]) => {
+        setRows([...rows, newRow]);
     }
 
     const operate = (op: Ops) => {
         const result = selectedNodes.reduce((acc, cur) => {
-            return acc.plus(cur)
+            console.log('acc', acc)
+            console.log('cur', cur)
+            switch (op) {
+                case Ops.Times:
+                    return acc.times(cur)
+                case Ops.Minus:
+                    return acc.minus(cur)
+                case Ops.Pow:
+                    return acc.pow(cur)
+                case Ops.Divided:
+                    return acc.divide(cur)
+                case Ops.ReLU:
+                    return acc.relu()
+                case Ops.Plus:
+                default:
+                    return acc.plus(cur)
+            }
         })
+
+        
         setSelectNodes([])
         setCanBackProps(true);
         setNodes([...nodes, result]);
+        addRow([op])
+        addRow([result])
     }
 
     const toggleSelectNode = (n: Value) => {
@@ -30,22 +62,40 @@ export function Graph() {
     }
 
     const backprop = () => {
-        const leaf = nodes.reverse().find(n => n.op !== Ops.Init)
+        const leaf = nodes.findLast(n => n.op !== Ops.Init)
         if (!leaf) return;
 
         leaf.backward();
+        addRow([])
+
     }
     return (
-        <div>
+        <Xwrapper>
             <input type="text" onChange={(e) => setInputVal(e.target.value)} value={inputVal}/>
             <br/>
 
-            <button onClick={addNode}>click</button>
+            <button onClick={addNode}>Add node</button>
             <br/>
+            {rows.map((r, ri) => {
+                return (
+                    <div key={ri}>
+                        {r.map((n, idx) => {
+                            if (typeof n === 'string') {
+                                return <OpNode op={n} key={idx}/>
+                            }
+                            return (
+                                <>
+                            <ValueNode node={n} key={idx} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>
+                            {n._parents.map(p =>  <Xarrow start={p.id} end={n.id}/>)}
+                            </>
+                            )
+                            })}
+                        <br/>
+                    </div>
+                )
+            })}
 
-            {nodes.map((n, idx) => <Nodde node={n} key={idx} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>)}
             <br/>
-
             {selectedNodes.length > 1 && (
                 <ul>
                     <button onClick={() => operate(Ops.Plus)}>+</button>
@@ -60,7 +110,7 @@ export function Graph() {
             {canBackProp && (
                 <button onClick={backprop}>Back!</button>
             )}
-        </div>
+        </Xwrapper>
     )
 }
 
