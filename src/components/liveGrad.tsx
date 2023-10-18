@@ -5,5 +5,5 @@ function LiveGrad() {
     const layer2Out = 10;
 
 
-    const layer = [];
+    return [layer1In, layer1Out, layer2Out]
 }
