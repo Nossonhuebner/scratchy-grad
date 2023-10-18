@@ -21,8 +21,6 @@ export function Graph() {
 
     const operate = (op: Ops) => {
         const result = selectedNodes.reduce((acc, cur) => {
-            console.log('acc', acc)
-            console.log('cur', cur)
             switch (op) {
                 case Ops.Times:
                     return acc.times(cur)
@@ -32,8 +30,6 @@ export function Graph() {
                     return acc.pow(cur)
                 case Ops.Divided:
                     return acc.divide(cur)
-                case Ops.ReLU:
-                    return acc.relu()
                 case Ops.Plus:
                 default:
                     return acc.plus(cur)
@@ -44,6 +40,13 @@ export function Graph() {
         setSelectNodes([])
         setCanBackProps(true);
         setNodes([...nodes, result]);
+    }
+
+    const relu = () => {
+        const results = selectedNodes.map(n => n.relu())
+        setSelectNodes([])
+        setCanBackProps(true);
+        setNodes([...nodes, ...results]);
     }
 
     const toggleSelectNode = (n: Value) => {
@@ -63,7 +66,7 @@ export function Graph() {
             <input type="text" onChange={(e) => setInputVal(e.target.value)} value={inputVal}/>
             <br/>
 
-            <button onClick={addNode}>Add node</button>
+            <button onClick={addNode} disabled={!inputVal || isNaN(Number(inputVal))}>Add node</button>
             <br/>
 
             {nodes.map((n, i)=> {
@@ -74,22 +77,26 @@ export function Graph() {
                     )}
                     <ValueNode node={n} key={n.id} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>
                     {n.op && n._parents.map(p =>  <Xarrow start={p.id} end={`${n.id}-${n.op}-${i}`}/>)}
-                    {n.op && (<Xarrow start={`${n.id}-${n.op}-${i}`} end={n.id}/>)}
+                    {n.op && (<Xarrow lineColor="green" headColor="green" start={`${n.id}-${n.op}-${i}`} end={n.id}/>)}
                 </>
                 )
             })}
 
             <br/>
+            <ul>
+
+            {selectedNodes.length > 0 && <li><button onClick={relu}>ReLU</button></li>}
             {selectedNodes.length > 1 && (
-                <ul>
-                    <button onClick={() => operate(Ops.Plus)}>+</button>
-                    <button onClick={() => operate(Ops.Minus)}>-</button>
-                    <button onClick={() => operate(Ops.Times)}>*</button>
-                    <button onClick={() => operate(Ops.Divided)}>/</button>
-                    {/* <button onClick={() => operate(Ops.)}>SQRT</button> */}
-                    {/* <button onClick={() => operate(Ops.Plus)}>^2</button> */}
-                </ul>
+                <>
+                    <li><button onClick={() => operate(Ops.Plus)}>+</button></li>
+                    <li><button onClick={() => operate(Ops.Minus)}>-</button></li>
+                    <li><button onClick={() => operate(Ops.Times)}>*</button></li>
+                    <li><button onClick={() => operate(Ops.Divided)}>/</button></li>
+                    {/* <li><button onClick={() => operate(Ops.)}>SQRT</button></li> */}
+                    {/* <li><button onClick={() => operate(Ops.Plus)}>^2</button></li> */}
+            </>
             )}
+             </ul>
             <br/>
             {canBackProp && (
                 <button onClick={backprop}>Back!</button>
