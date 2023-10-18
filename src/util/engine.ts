@@ -47,7 +47,15 @@ export class Value {
     }
 
     minus(other: number | Value) {
-        return this.plus(asValue(other).data * -1);
+        const x = asValue(other)
+        const result = new Value(this.data - x.data, [this, x], Ops.Minus)
+
+        result._back = () => {
+            this.grad += result.grad
+            x.grad += -(result.grad)
+        }
+
+        return result;
     }
 
     times(other: number | Value) {

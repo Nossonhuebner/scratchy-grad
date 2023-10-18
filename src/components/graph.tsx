@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { OpNode, ValueNode } from "./node";
 import { Ops, Value } from "../util/engine"
 import Xarrow, { Xwrapper } from "react-xarrows";
@@ -10,22 +10,14 @@ export function Graph() {
     const [inputVal, setInputVal] = useState('');
     const [selectedNodes, setSelectNodes] = useState<Value[]>([]);
     const [canBackProp, setCanBackProps] = useState(false);
-    const [rows, setRows]  = useState<(Value | string)[][]>([[]])
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     const addNode = () => {
         const val = new Value(Number(inputVal), [], Ops.Init);
         setNodes([...nodes, val]);
-        addToLastRow(val);
         setInputVal('')
     }
 
-    const addToLastRow = (val: Value) => {
-        setRows([...rows.slice(0, rows.length-1), [...rows[rows.length-1], val]]);
-    }
-
-    const addRow = (newRow: (Value | string)[]) => {
-        setRows([...rows, newRow]);
-    }
 
     const operate = (op: Ops) => {
         const result = selectedNodes.reduce((acc, cur) => {
@@ -52,12 +44,10 @@ export function Graph() {
         setSelectNodes([])
         setCanBackProps(true);
         setNodes([...nodes, result]);
-        addRow([op])
-        addRow([result])
     }
 
     const toggleSelectNode = (n: Value) => {
-        const newState = selectedNodes.includes(n) ? selectedNodes.filter(node => node == n) : [...selectedNodes, n]
+        const newState = selectedNodes.includes(n) ? selectedNodes.filter(node => node != n) : [...selectedNodes, n]
         setSelectNodes(newState);
     }
 
@@ -66,8 +56,7 @@ export function Graph() {
         if (!leaf) return;
 
         leaf.backward();
-        addRow([])
-
+        forceUpdate();
     }
     return (
         <Xwrapper>
@@ -76,22 +65,17 @@ export function Graph() {
 
             <button onClick={addNode}>Add node</button>
             <br/>
-            {rows.map((r, ri) => {
+
+            {nodes.map((n, i)=> {
                 return (
-                    <div key={ri}>
-                        {r.map((n, idx) => {
-                            if (typeof n === 'string') {
-                                return <OpNode op={n} key={idx}/>
-                            }
-                            return (
-                                <>
-                            <ValueNode node={n} key={idx} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>
-                            {n._parents.map(p =>  <Xarrow start={p.id} end={n.id}/>)}
-                            </>
-                            )
-                            })}
-                        <br/>
-                    </div>
+                    <>
+                    {n.op && (
+                        <OpNode op={n.op} key={`${n.id}-{op}`} id={`${n.id}-${n.op}-${i}`}/>
+                    )}
+                    <ValueNode node={n} key={n.id} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>
+                    {n.op && n._parents.map(p =>  <Xarrow start={p.id} end={`${n.id}-${n.op}-${i}`}/>)}
+                    {n.op && (<Xarrow start={`${n.id}-${n.op}-${i}`} end={n.id}/>)}
+                </>
                 )
             })}
 
