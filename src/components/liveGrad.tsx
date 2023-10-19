@@ -1,6 +1,6 @@
 import { useReducer, useState } from "react";
 import { Ops, Value } from "../util/engine"
-import { Stack, Box, Button} from "@mui/material";
+import { Stack, Button, TextField, Divider, Grid} from "@mui/material";
 import { Graph } from "./graph";
 
 
@@ -35,6 +35,8 @@ export function LiveGrad() {
             }
         })
 
+        // there will be intermediary '_parents' used to build the graph, but this leads to a bug where the arrows try pointing to them when they dont exist as Value Nodes on the DOM. 
+        // introducing the selectedNodes as 'displayContributors' instead of just using _parents resolves this
         result.displayContributors = selectedNodes
         setSelectNodes([])
         setCanBackProps(true);
@@ -42,7 +44,11 @@ export function LiveGrad() {
     }
 
     const relu = () => {
-        const results = selectedNodes.map(n => n.relu())
+        const results = selectedNodes.map(n => {
+            const result = n.relu();
+            result.displayContributors = [n]
+            return result;
+        })
         setSelectNodes([])
         setCanBackProps(true);
         setNodes([...nodes, ...results]);
@@ -64,20 +70,33 @@ export function LiveGrad() {
         nodes.forEach(n => n.grad = 0)
         forceUpdate();
     }
+
+    const keyHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const validInput = inputVal && !isNaN(Number(inputVal))
+        if (e.key === 'Enter' && validInput) {
+            addNode();
+        }
+    }
     return (
         <Stack direction="row">
-            <Stack className="inputButtons">
-                <input type="text" onChange={(e) => setInputVal(e.target.value)} value={inputVal}/>
+            <Stack className="liveGradInput">
+                <TextField type="text" variant="filled" onChange={(e) => setInputVal(e.target.value)} value={inputVal} onKeyDown={keyHandler}/>
                 <Button onClick={addNode} disabled={!inputVal || isNaN(Number(inputVal))}>Add node</Button>
-                <Button disabled={selectedNodes.length == 0} onClick={relu}>ReLU</Button>
-                <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Plus)}>+</Button>
-                <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Minus)}>-</Button>
-                <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Times)}>*</Button>
-                <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Divided)}>/</Button>
-                {/* <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.)}>SQRT</Button> */}
-                {/* <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Plus)}>^2</Button> */}
-                <Button disabled={!canBackProp} onClick={backprop}>Back!</Button>
-                <Button disabled={nodes.length == 0} onClick={zero}>zero grad</Button>
+                <Divider/>
+                <Grid container>
+                    <Grid item xs={6}><Button disabled={selectedNodes.length == 0} onClick={relu}>ReLU</Button></Grid>
+                    <Grid item xs={6}><Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Plus)}>+</Button></Grid>
+                    <Grid item xs={6}><Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Minus)}>-</Button></Grid>
+                    <Grid item xs={6}><Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Times)}>*</Button></Grid>
+                    <Grid item xs={6}><Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Divided)}>/</Button></Grid>
+                    {/* <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.)}>SQRT</Button> */}
+                    {/* <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Plus)}>^2</Button> */}
+                </Grid>
+                <Divider/>
+                <Grid container>
+                <Grid item xs={6}><Button disabled={!canBackProp} onClick={backprop}>Back!</Button></Grid>
+                <Grid item xs={6}><Button disabled={nodes.length == 0} onClick={zero}>zero grad</Button></Grid>
+                </Grid>
             </Stack>
             <Graph nodes={nodes} selectedNodes={selectedNodes} toggleSelectNode={toggleSelectNode}/>
         </Stack>
