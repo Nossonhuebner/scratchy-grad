@@ -4,7 +4,6 @@ import { Ops, Value } from "../util/engine"
 import Xarrow, { Xwrapper } from "react-xarrows";
 
 
-
 export function Graph() {
     const [nodes, setNodes] = useState<Value[]>([]);
     const [inputVal, setInputVal] = useState('');
@@ -36,7 +35,7 @@ export function Graph() {
             }
         })
 
-        
+        result.displayContributors = selectedNodes
         setSelectNodes([])
         setCanBackProps(true);
         setNodes([...nodes, result]);
@@ -62,101 +61,43 @@ export function Graph() {
         forceUpdate();
     }
     return (
-        <Xwrapper>
+        <>
             <input type="text" onChange={(e) => setInputVal(e.target.value)} value={inputVal}/>
-            <br/>
-
             <button onClick={addNode} disabled={!inputVal || isNaN(Number(inputVal))}>Add node</button>
-            <br/>
+            <Xwrapper>
+                {nodes.map((n, i)=> {
+                    return (
+                        <>
+                        <ValueNode node={n} key={n.id} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>
 
-            {nodes.map((n, i)=> {
-                return (
-                    <>
-                    {n.op && (
-                        <OpNode op={n.op} key={`${n.id}-{op}`} id={`${n.id}-${n.op}-${i}`}/>
-                    )}
-                    <ValueNode node={n} key={n.id} selectNode={toggleSelectNode} selected={selectedNodes.includes(n)}/>
-                    {n.op && n._parents.map(p =>  <Xarrow start={p.id} end={`${n.id}-${n.op}-${i}`}/>)}
-                    {n.op && (<Xarrow lineColor="green" headColor="green" start={`${n.id}-${n.op}-${i}`} end={n.id}/>)}
-                </>
-                )
-            })}
-
-            <br/>
-            <ul>
-
-            {selectedNodes.length > 0 && <li><button onClick={relu}>ReLU</button></li>}
+                        {n.op && (
+                            <>
+                                <OpNode op={n.op} key={`${n.id}-{op}`} id={`${n.id}-${n.op}-${i}`}/>
+                                {n.displayContributors.map(p =>  {
+                                    return <Xarrow start={p.id} end={`${n.id}-${n.op}-${i}`}/>
+                                })}
+                                <Xarrow lineColor="green" headColor="green" start={`${n.id}-${n.op}-${i}`} end={n.id}/>
+                            </>
+                        )}
+                    </>
+                    )
+                })}
+            </Xwrapper>
+            {selectedNodes.length > 0 && <button onClick={relu}>ReLU</button>}
             {selectedNodes.length > 1 && (
                 <>
-                    <li><button onClick={() => operate(Ops.Plus)}>+</button></li>
-                    <li><button onClick={() => operate(Ops.Minus)}>-</button></li>
-                    <li><button onClick={() => operate(Ops.Times)}>*</button></li>
-                    <li><button onClick={() => operate(Ops.Divided)}>/</button></li>
-                    {/* <li><button onClick={() => operate(Ops.)}>SQRT</button></li> */}
-                    {/* <li><button onClick={() => operate(Ops.Plus)}>^2</button></li> */}
+                    <button onClick={() => operate(Ops.Plus)}>+</button>
+                    <button onClick={() => operate(Ops.Minus)}>-</button>
+                    <button onClick={() => operate(Ops.Times)}>*</button>
+                    <button onClick={() => operate(Ops.Divided)}>/</button>
+                    {/* <button onClick={() => operate(Ops.)}>SQRT</button> */}
+                    {/* <button onClick={() => operate(Ops.Plus)}>^2</button> */}
             </>
             )}
-             </ul>
             <br/>
             {canBackProp && (
                 <button onClick={backprop}>Back!</button>
             )}
-        </Xwrapper>
+            </>
     )
 }
-
-
-// const boxStyle = {
-//     border: '1px #999 solid',
-//     borderRadius: '10px',
-//     textAlign: 'center',
-//     width: '100px',
-//     height: '30px',
-//     color: 'black',
-//     alignItems: 'center',
-//     display: 'flex',
-//     justifyContent: 'center',
-// } as const;
-
-// const canvasStyle = {
-//     width: '100%',
-//     height: '100vh',
-//     background: 'white',
-//     overflow: 'auto',
-//     display: 'flex',
-//     color: 'black',
-// } as const;
-
-// const DraggableBox = ({box}) => {
-//     const updateXarrow = useXarrow();
-//     return (
-//         <Draggable onDrag={updateXarrow} onStop={updateXarrow}>
-//             <div id={box.id} style={{...boxStyle, position: 'absolute', left: box.x, top: box.y}}>
-//                 {box.id}
-//             </div>
-//         </Draggable>
-//     );
-// };
-
-// const SimpleTemplate = () => {
-//     const box = {id: 'box1', x: 20, y: 20};
-//     const box2 = {id: 'box2', x: 320, y: 120};
-//     const box3 = {id: 'box3', x: 50, y: 150};
-//     const box4 = {id: 'box4', x: 320, y: 220};
-//     return (
-//         <div style={canvasStyle} id="canvas">
-//             <Xwrapper>
-//                 <DraggableBox box={box}/>
-//                 <DraggableBox box={box2}/>
-//                 <Xarrow start={'box1'} end={'box2'}/>
-//                 <Xarrow start={'box1'} end={'box2'} endAnchor={'top'}/>
-//                 <Xarrow start={'box1'} end={'box2'} startAnchor={'bottom'}/>
-//             </Xwrapper>
-//             <Xwrapper>
-//                 <DraggableBox box={box3}/>
-//                 <DraggableBox box={box4}/>
-//                 <Xarrow start={'box3'} end={'box4'}/>
-//             </Xwrapper>
-//         </div>
-//     );
-// };

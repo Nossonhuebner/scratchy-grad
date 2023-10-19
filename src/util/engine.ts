@@ -24,6 +24,7 @@ export class Value {
     _parents: Value[];
 
     id: string; //used for rendering and does not belong here at all! 
+    displayContributors: Value[]=[];
 
     constructor(data: number, parents: Value[]=[], op: Ops = Ops.Init) {
         this.data = data;
