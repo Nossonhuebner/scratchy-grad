@@ -60,6 +60,10 @@ export function LiveGrad() {
         leaf.backward();
         forceUpdate();
     }
+    const zero = () => {
+        nodes.forEach(n => n.grad = 0)
+        forceUpdate();
+    }
     return (
         <Stack direction="row">
             <Stack className="inputButtons">
@@ -73,6 +77,7 @@ export function LiveGrad() {
                 {/* <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.)}>SQRT</Button> */}
                 {/* <Button disabled={selectedNodes.length < 2} onClick={() => operate(Ops.Plus)}>^2</Button> */}
                 <Button disabled={!canBackProp} onClick={backprop}>Back!</Button>
+                <Button disabled={nodes.length == 0} onClick={zero}>zero grad</Button>
             </Stack>
             <Graph nodes={nodes} selectedNodes={selectedNodes} toggleSelectNode={toggleSelectNode}/>
         </Stack>
