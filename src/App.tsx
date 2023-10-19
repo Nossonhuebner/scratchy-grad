@@ -1,10 +1,10 @@
 import './App.css'
-import { Graph } from './components/graph'
+import { LiveGrad } from './components/liveGrad'
 
 function App() {
   return (
     <>
-      <Graph/>
+      <LiveGrad/>
     </>
   )
 }

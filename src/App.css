@@ -17,3 +17,13 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.inputButtons .MuiButtonBase-root:disabled {
+  background-color: #929292;
+}
+
+.inputButtons .MuiButtonBase-root {
+  margin-top: 5px;
+  width: fit-content;
+}
