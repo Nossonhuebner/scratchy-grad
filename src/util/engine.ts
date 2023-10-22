@@ -18,13 +18,15 @@ export enum Ops {
 
 export class Value {
     data: number;
-    op: Ops;
     grad: number;
     _back = () => {}
     _parents: Value[];
 
-    id: string; //used for rendering and does not belong here at all! 
+    // used for rendering and does not belong here at all!: 
+    id: string;
     displayContributors: Value[]=[];
+    op: Ops;
+
 
     constructor(data: number, parents: Value[]=[], op: Ops = Ops.Init) {
         this.data = data;
