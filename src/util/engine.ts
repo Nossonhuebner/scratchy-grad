@@ -14,6 +14,8 @@ export enum Ops {
     Divided = '/',
     Pow = '**',
     ReLU = 'ReLU',
+    Exp = 'Exp',
+    Log = 'Log',
 }
 
 export class Value {
@@ -103,6 +105,30 @@ export class Value {
         }
 
         return result;
+    }
+
+    exp() {
+        const result = new Value(Math.exp(this.data), [this], Ops.Exp)
+
+        result._back = () => {
+            this.grad += Math.exp(this.data) * result.grad;
+        }
+
+        return result;
+    }
+
+    log() {
+        const result = new Value(Math.log(this.data), [this], Ops.Log)
+
+        result._back = () => {
+            this.grad += (1 / this.data) * result.grad;
+        }
+
+        return result;
+    }
+
+    neg() {
+        return this.times(-1);
     }
 
     backward() {

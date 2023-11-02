@@ -72,3 +72,27 @@ export class MLP {
     }
 
 }
+
+export function softmax(values: Value[]) {
+    const exps = values.map(v => v.exp())
+    const sum = exps.reduce((acc, v) => acc.plus(v), new Value(0))
+    return exps.map(v => v.divide(sum))
+}
+
+export function negativeLogLikelihood(probs: Value[], target: number) {
+    return probs[target].log().neg()
+}
+
+window.softmax = softmax;
+window.negativeLogLikelihood = negativeLogLikelihood;
+
+
+
+function optimize(net: MLP) {
+    const params = net.parameters;
+    const lr = 0.01;
+    for (let i = 0; i < params.length; i++) {
+        params[i].data -= lr * params[i].grad;
+    }
+
+}
