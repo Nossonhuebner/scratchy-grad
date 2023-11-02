@@ -59,12 +59,14 @@ export class MLP {
         }
     }
 
-    forward(inputs: (Value | number)[]) {
-        let outputs = inputs;
+    forward(inputs: (Value | number)[]): Value[] {
+        let inns = inputs;
+        let outs: Value[] = []; // fix this - was done for typing
         for (let i = 0; i < this.layers.length; i++) {
-            outputs = this.layers[i].forward(outputs);
+            outs = this.layers[i].forward(inns);
+            inns = outs;
         }
-        return outputs;
+        return outs;
     }
 
     get parameters() {

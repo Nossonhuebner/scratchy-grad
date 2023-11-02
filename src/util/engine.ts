@@ -138,6 +138,14 @@ export class Value {
         sorted.reverse().forEach(v => v._back())
     }
 
+    negativeLogLikelihood() {
+        return this.nll();
+    }
+
+    nll() {
+        return this.log().neg()
+    }
+
 
     toString() {
         return `[Value] data: ${this.data}, op: '${this.op}', grad: ${this.grad}`

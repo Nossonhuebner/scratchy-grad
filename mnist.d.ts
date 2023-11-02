@@ -1,9 +1,7 @@
-declare module "mnist" {
-    type Output = [number, number, number, number, number, number, number, number, number, number];
-  
-    type Datum = {
+declare module "mnist" {  
+    export type Datum = {
       input: number[];
-      output: Output;
+      output: number[];
     };
   
     interface Digit {
