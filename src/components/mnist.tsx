@@ -1,5 +1,5 @@
 import mnist, { Datum } from 'mnist';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MLP, softmax } from '../util/nn';
 import { Button, TextField } from '@mui/material';
 import Chart from './chart'
@@ -19,7 +19,9 @@ function Mnist() {
     // const mnistRef = useRef<HTMLCanvasElement>(null)
     // const chartRef = useRef<HTMLCanvasElement>(null)
 
-    const net = new MLP(28 * 28, [10]);
+    const net = useMemo(() => {
+        return new MLP(28 * 28, [10])
+    }, []);
 
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
@@ -27,9 +29,29 @@ function Mnist() {
     const [numEpoc, setNumEpoc] = useState<number>(1);
     const [lr, setLr] = useState<number>(0.0001)
 
+    const set = mnist.set(1, 1)
+
+    const sett: typeof set = useMemo(() => {
+        return {
+        training: [],
+        test: []
+        }
+    }, []);
+
+    for(let i = 0; i < 10; i++) {
+        const a = mnist[i].range(10, 13);
+        const y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        y[i] = 1;
+        const b = a.map(i => {
+            return {input: i, output: y }
+        })
+        sett.training.push(b[0], b[1])
+        sett.test.push(b[2])
+    }
+
+
     const run = () => {
-        const set = mnist.set(20, 6);
-        runLoop(net, set.training, set.test, 1, 0.0001)
+        runLoop(net, sett.training, sett.test, numEpoc, lr)
     }
 
     function runLoop(net: MLP, training: Datum[], validation: Datum[], steps: number, lr: number) {
@@ -38,7 +60,7 @@ function Mnist() {
             const l = train(net, training, lr);
             const a = valid(net, validation);
             setLoss([...loss, l])
-            setAccuracy([...accuracy, a])
+            setAccuracy([...accuracy, a*10])
         }
     }
 
