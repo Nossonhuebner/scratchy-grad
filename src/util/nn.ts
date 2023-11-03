@@ -87,14 +87,3 @@ export function negativeLogLikelihood(probs: Value[], target: number) {
 
 window.softmax = softmax;
 window.negativeLogLikelihood = negativeLogLikelihood;
-
-
-
-function optimize(net: MLP) {
-    const params = net.parameters;
-    const lr = 0.01;
-    for (let i = 0; i < params.length; i++) {
-        params[i].data -= lr * params[i].grad;
-    }
-
-}
