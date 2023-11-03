@@ -1,9 +1,9 @@
 import mnist, { Datum } from 'mnist';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { MLP, softmax } from '../util/nn';
 import { Button, TextField } from '@mui/material';
 import Chart from './chart'
-
+// import * as tf from '@tensorflow/tfjs'
 
 declare global {
     interface Window {
@@ -15,44 +15,17 @@ declare global {
 }
 
 function Mnist() {
-
-    // const mnistRef = useRef<HTMLCanvasElement>(null)
-    // const chartRef = useRef<HTMLCanvasElement>(null)
-
-    const net = useMemo(() => {
-        return new MLP(28 * 28, [10])
-    }, []);
+    const mnistRef = useRef<HTMLCanvasElement>(null)
+    const net = useMemo(() => new MLP(28 * 28, [10]), []);
 
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
 
-    const [numEpoc, setNumEpoc] = useState<number>(1);
-    const [lr, setLr] = useState<number>(0.0001)
+    const set: {
+        training: Datum[];
+        test: Datum[];
+      } = useMemo(getData, []);
 
-    const set = mnist.set(1, 1)
-
-    const sett: typeof set = useMemo(() => {
-        return {
-        training: [],
-        test: []
-        }
-    }, []);
-
-    for(let i = 0; i < 10; i++) {
-        const a = mnist[i].range(10, 13);
-        const y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        y[i] = 1;
-        const b = a.map(i => {
-            return {input: i, output: y }
-        })
-        sett.training.push(b[0], b[1])
-        sett.test.push(b[2])
-    }
-
-
-    const run = () => {
-        runLoop(net, sett.training, sett.test, numEpoc, lr)
-    }
 
     function runLoop(net: MLP, training: Datum[], validation: Datum[], steps: number, lr: number) {
         for(let i = 0; i < steps; i++) {
@@ -64,32 +37,37 @@ function Mnist() {
         }
     }
 
+    runLoop(net, set.training, set.test, 50, 0.001)
+
+    const a = mnist[1].get()
+    a.length
+
+    function getData() {
+        // hacky way to ensure we're seeing all numbers consistantly in training + validation
+        const training = [];
+        const test = [];
+        for(let i = 0; i < 10; i++) {
+            const range = mnist[i].range(10, 15);
+            const y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+            y[i] = 1;
+            const item = range.map(i => {
+                return {input: i, output: y }
+            })
+            training.push(item[0], item[1], item[2])
+            test.push(item[3], item[4])
+        }
+        return {
+            training,
+            test
+        };
+    }
+
     window.net = net;
-    // useEffect(() => {
-    //     // if (mnistRef.current) {
-    //     //     const context = mnistRef.current.getContext('2d')
-    //     //     if (context) {
-    //     //         mnist.draw(digit, context, 100, 100);
-
-    //     //     }
-    //     // }
-
-    //     if (mnistRef.current) {
-    //         if (context) {
-
-    //         }
-    //     }
-
-    // }, []);
 
     return (
         <div>
             <h1>Mnist</h1>
-            {/* <canvas ref={mnistRef} /> */}
-            <TextField onChange={e => setLr(parseFloat(e.currentTarget.value))} value={lr} label="lr"/>
-            <TextField onChange={e => setNumEpoc(parseInt(e.currentTarget.value))} value={numEpoc} label="num epoc"/>
-            <Button onClick={run}>run </Button>
-
+            <canvas ref={mnistRef} />
             <Chart accuracy={accuracy} loss={loss}/>
         </div>
     )
@@ -143,6 +121,24 @@ function train(net: MLP, training: Datum[], lr: number) {
     console.log('avgLoss:',avg);
     return avg;
 }
+
+
+
+// async function trainTf(training: Datum[], lr: number) {
+//     const model = tf.sequential({
+//         layers: [
+//             tf.layers.dense({inputShape: [28*28], units: 10})
+//         ]
+//     })
+//     model.compile({loss: tf.losses.softMaxCrossEntropy, optimizer: 'sgd'});
+
+//     const inn = tf.tensor(training.map(t => t.input))
+//     const outt = tf.tensor(training.map(t => t.output))
+
+
+//     await model.fit(inn, outt, {epochs: 10})
+
+// }
 
 
 export default Mnist;

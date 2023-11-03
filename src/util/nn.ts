@@ -76,7 +76,10 @@ export class MLP {
 }
 
 export function softmax(values: Value[]) {
-    const exps = values.map(v => v.exp())
+    // subtract maxVal to avoid NaN from exp explosions!
+    const maxVal = Math.max(...values.map(v => v.data))
+
+    const exps = values.map(v => v.minus(maxVal).exp())
     const sum = exps.reduce((acc, v) => acc.plus(v), new Value(0))
     return exps.map(v => v.divide(sum))
 }
