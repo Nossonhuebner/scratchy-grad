@@ -1,7 +1,7 @@
 import mnist, { Datum } from 'mnist';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { MLP, softmax } from '../util/nn';
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import Chart from './chart'
 // import * as tf from '@tensorflow/tfjs'
 
@@ -20,27 +20,29 @@ function Mnist() {
 
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
+    const [stepCount, setStepCount] = useState(0);
 
     const set: {
         training: Datum[];
         test: Datum[];
       } = useMemo(getData, []);
 
-
-    function runLoop(net: MLP, training: Datum[], validation: Datum[], steps: number, lr: number) {
-        for(let i = 0; i < steps; i++) {
-            console.log(`epoc #${i}:`)
-            const l = train(net, training, lr);
-            const a = valid(net, validation);
-            setLoss([...loss, l])
-            setAccuracy([...accuracy, a*10])
+    useEffect(() => {
+        if (stepCount > 0) {
+            console.log(`epoc: ${Math.abs(5 - stepCount)}`)
+            runEpoc(net, set.training, set.test, 0.01)
+            setStepCount(cur => cur - 1)
         }
+    }, [stepCount])
+
+
+    function runEpoc(net: MLP, training: Datum[], validation: Datum[], lr: number) {
+        const l = train(net, training, lr);
+        const a = valid(net, validation);
+        setLoss([...loss, l])
+        setAccuracy([...accuracy, a])
     }
 
-    runLoop(net, set.training, set.test, 50, 0.001)
-
-    const a = mnist[1].get()
-    a.length
 
     function getData() {
         // hacky way to ensure we're seeing all numbers consistantly in training + validation
@@ -68,12 +70,13 @@ function Mnist() {
         <div>
             <h1>Mnist</h1>
             <canvas ref={mnistRef} />
-            <Chart accuracy={accuracy} loss={loss}/>
+            <Button onClick={() => setStepCount(5)}>Train</Button>
+            <Chart data={loss} label="Loss" color="red"/>
+            <Chart data={accuracy} label="Accuracy" color="def not red lol"/>
         </div>
     )
 
 }
-
 
 
 function valid(net: MLP, validation: Datum[]) {
@@ -112,8 +115,8 @@ function train(net: MLP, training: Datum[], lr: number) {
         const loss = probs[output.indexOf(1)].negativeLogLikelihood()
         aggLoss += loss.data;
 
+        //backward
         net.parameters.forEach(p => p.grad = 0);
-
         loss.backward()
         net.parameters.forEach(p => p.data += -lr*p.grad)
     })

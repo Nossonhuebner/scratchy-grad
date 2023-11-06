@@ -7,13 +7,26 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import ErrorPage from "./error-page";
-
+import { LiveGrad } from './components/liveGrad.tsx';
+import Mnist from './components/mnist.tsx';
+import HomePage from './Home.tsx';
 
 const router = createBrowserRouter([
   {
     path: "/tensor-ts",
     element: <App />,
     errorElement: <ErrorPage />,
+    children: [
+    {
+      path: "/tensor-ts/", index: true, element: <HomePage/>
+    },
+    {
+      path: "/tensor-ts/live/",element: <LiveGrad />
+    },
+    {
+      path: "/tensor-ts/mnist/",element: <Mnist />
+    }
+  ]
   },
 ]);
 

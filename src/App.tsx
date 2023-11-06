@@ -1,14 +1,20 @@
+import { Outlet } from 'react-router-dom'
 import './App.css'
-import { LiveGrad } from './components/liveGrad'
-import Mnist from './components/mnist'
+import { Sidebar } from './Sidebar'
 
 function App() {
   return (
-    <>
-      <LiveGrad/>
-      <Mnist />
-    </>
+    <div className="appContainer">
+      <Sidebar/>
+      <div className="content">
+        <Outlet />
+        {/* <LiveGrad/> */}
+          {/* <Mnist /> */}
+        </div>
+    </div>
   )
 }
 
 export default App
+
+

@@ -20,9 +20,9 @@ import { Line } from 'react-chartjs-2';
     Legend
   );
 
+
+function Chart({data, label, color}: {data: number[], label: string, color: string}) {
   
-  function Chart({accuracy, loss}: {accuracy: number[], loss: number[]}) {
-    
   const options = {
     responsive: true,
     plugins: {
@@ -36,27 +36,21 @@ import { Line } from 'react-chartjs-2';
     },
   };
 
-  const labels = [...Array(10 + accuracy.length).keys()]; // why :(
+  const labels = [...Array(10 + data.length).keys()]; // why :(
 
-  const data = {
+  const chartData = {
   labels,
   datasets: [
       {
-        label: 'Loss',
-        data: loss,
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      },
-      {
-        label: 'Accuracy',
-        data: accuracy,
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        label: label,
+        data: data,
+        borderColor: color == 'red' ? 'rgb(255, 99, 132)' : 'rgb(53, 162, 235)',
+        backgroundColor: color == 'red' ?  'rgba(255, 99, 132, 0.5)' : 'rgba(53, 162, 235, 0.5)',
       },
     ],
   };
 
-  return <Line options={options} data={data} />;
+  return <Line options={options} data={chartData} />;
 }
 
 export default Chart;
