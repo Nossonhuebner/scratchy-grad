@@ -1,7 +1,7 @@
 import mnist, { Datum } from 'mnist';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { MLP, softmax } from '../../util/nn';
-import { Button, Card, Stack } from '@mui/material';
+import { Button } from '@mui/material';
 import Chart from './chart'
 import { Value } from '../../util/engine';
 import DigitPreview from './digitPreview';
