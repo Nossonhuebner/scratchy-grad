@@ -7,8 +7,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import ErrorPage from "./error-page";
-import { LiveGrad } from './components/liveGrad.tsx';
-import Mnist from './components/mnist.tsx';
+import { LiveGrad } from './components/live/liveGrad.tsx';
+import Mnist from './components/mnist/mnist.tsx';
 import HomePage from './Home.tsx';
 
 const router = createBrowserRouter([

@@ -1,5 +1,5 @@
 import { OpNode, ValueNode } from "./node";
-import { Value } from "../util/engine"
+import { Value } from "../../util/engine"
 import Xarrow, { Xwrapper } from "react-xarrows";
 import { Box } from "@mui/material";
 

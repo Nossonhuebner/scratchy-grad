@@ -1,5 +1,5 @@
 import { useReducer, useState } from "react";
-import { Ops, Value } from "../util/engine"
+import { Ops, Value } from "../../util/engine"
 import { Stack, Button, TextField, Divider, Grid, Box, Card} from "@mui/material";
 import { Graph } from "./graph";
 

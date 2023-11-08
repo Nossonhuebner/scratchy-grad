@@ -37,3 +37,10 @@
 .appContainer {
   display: flex;
 }
+
+
+/* digit */
+.digitCanvas {
+  width: 60px;
+  height: 60px;
+}

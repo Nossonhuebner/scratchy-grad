@@ -22,7 +22,6 @@ import { Line } from 'react-chartjs-2';
 
 
 function Chart({data, label, color}: {data: number[], label: string, color: string}) {
-  
   const options = {
     responsive: true,
     plugins: {
