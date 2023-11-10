@@ -87,6 +87,3 @@ export function softmax(values: Value[]) {
 export function negativeLogLikelihood(probs: Value[], target: number) {
     return probs[target].log().neg()
 }
-
-window.softmax = softmax;
-window.negativeLogLikelihood = negativeLogLikelihood;
