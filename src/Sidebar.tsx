@@ -23,19 +23,19 @@ export function Sidebar() {
     >
       <List>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to={`/tensor-ts/`}>
+            <ListItemButton component={Link} to={`/scratchy-grad/`}>
               <ListItemText primary="Home" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton component={Link} to={`/tensor-ts/live`}>
+            <ListItemButton component={Link} to={`/scratchy-grad/live`}>
               <ListItemText primary="Live Grad" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton component={Link} to={`/tensor-ts/mnist`}>
+            <ListItemButton component={Link} to={`/scratchy-grad/mnist`}>
               <ListItemText primary="MNIST" />
             </ListItemButton>
           </ListItem>

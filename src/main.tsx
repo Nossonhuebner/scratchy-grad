@@ -13,18 +13,18 @@ import HomePage from './Home.tsx';
 
 const router = createBrowserRouter([
   {
-    path: "/tensor-ts",
+    path: "/scratchy-grad",
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
     {
-      path: "/tensor-ts/", index: true, element: <HomePage/>
+      path: "/scratchy-grad/", index: true, element: <HomePage/>
     },
     {
-      path: "/tensor-ts/live/",element: <LiveGrad />
+      path: "/scratchy-grad/live/",element: <LiveGrad />
     },
     {
-      path: "/tensor-ts/mnist/",element: <Mnist />
+      path: "/scratchy-grad/mnist/",element: <Mnist />
     }
   ]
   },
