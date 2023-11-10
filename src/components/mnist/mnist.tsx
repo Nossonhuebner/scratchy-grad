@@ -1,50 +1,35 @@
 import mnist, { Datum } from 'mnist';
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { MLP, softmax } from '../../util/nn';
-import { Button } from '@mui/material';
+import { Button, Stack, TextField } from '@mui/material';
 import Chart from './chart'
 import { Value } from '../../util/engine';
 import DigitPreview from './digitPreview';
-// import * as tf from '@tensorflow/tfjs'
 
-declare global {
-    interface Window {
-        asdf: any;
-        net: any;
-        softmax: any;
-        negativeLogLikelihood: any;
-    }
-}
-
-type ImageItem = Datum & {loss?: number, preds?: number[]}
+type ImageItem = Datum & { loss?: number, preds?: number[] }
 type ImageDataSet = {
     training: ImageItem[],
     test: ImageItem[],
 }
 
 function Mnist() {
-    const mnistRef = useRef<HTMLCanvasElement>(null)
     const net = useMemo(() => new MLP(28 * 28, [10]), []);
 
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
     const [stepCount, setStepCount] = useState(Infinity);
-    const [dataset, setDataset] = useState<ImageDataSet>({training: [], test: []})
-
-
-    // const set: {
-    //     training: Datum[];
-    //     test: Datum[];
-    //   } = useMemo(getData, []);
-
-    const loopSize = 10;
+    const [dataset, setDataset] = useState<ImageDataSet>({ training: [], test: [] })
+    const [epocs, setEpocs] = useState(10)
+    const [batchSize, setBatchSize] = useState(60)
+    const [lr, setLr] = useState(0.001)
 
     useEffect(() => {
-        if (stepCount < loopSize) {
+        if (stepCount < epocs) {
             console.log(`epoc: ${stepCount}`)
-            const set = getData(stepCount * 10)
+            const set = getData(batchSize)
             setDataset(() => set)
-            runEpoc(net, set.training, set.test, 0.001)
+            console.log(set)
+            runEpoc(net, set.training, set.test, lr)
             setStepCount(cur => cur + 1)
         }
     }, [stepCount, dataset])
@@ -56,36 +41,27 @@ function Mnist() {
         setAccuracy([...accuracy, a])
     }
 
-    window.net = net;
-
-    const digit = mnist[0].get(1)
-    useEffect(() => {
-        if (mnistRef.current) {
-        const context = mnistRef.current.getContext('2d')
-        if (context) {
-            mnist.draw(digit, context, 0, 0);
-        }
-    }
-
-    }, []);
-
     return (
         <div>
             <h1>Mnist</h1>
-            {/* <Card>
-                <Stack direction="row" style={{width: 'fit-content'}}>
-                    <canvas ref={mnistRef} height="28" width="28" className="digitCanvas"/>
-                </Stack>
-            </Card> */}
             {/* {dataset?.training.map(trainItem => (
                 <DigitPreview digit={trainItem.input} label={trainItem.output.indexOf(1)} loss={trainItem.loss}/>
             ))} */}
-            {dataset?.test.map(testItem => (
-                <DigitPreview digit={testItem.input} label={testItem.output.indexOf(1)} preds={testItem.preds}/>
-            ))}
+
+
+            <TextField label="#Epocs" variant="outlined" type="number" value={epocs} onChange={(e) => setEpocs(parseInt(e.currentTarget.value))} />
+            <TextField label="Batch size" variant="outlined" type="number" value={batchSize} onChange={(e) => setBatchSize(parseInt(e.currentTarget.value))} />
+            <TextField label="Learning rate" variant="outlined" type="number" value={lr} onChange={(e) => setLr(parseFloat(e.currentTarget.value))} />
             <Button onClick={() => setStepCount(0)}>Train</Button>
-            <Chart data={loss} label="Loss" color="red"/>
-            <Chart data={accuracy} label="Accuracy" color="def not red lol"/>
+            <Chart data={loss} label="Loss" color="red" />
+            <Stack direction="row" className="resultsContainer">
+                <Chart data={accuracy} label="Accuracy" color="def not red lol" />
+                <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
+                    {dataset?.test.map((testItem, idx) => (
+                        <DigitPreview key={idx} digit={testItem.input} label={testItem.output.indexOf(1)} preds={testItem.preds} />
+                    ))}
+                </div>
+            </Stack>
         </div>
     )
 }
@@ -99,7 +75,7 @@ function valid(net: MLP, validation: ImageItem[]) {
 
         const logits = net.forward(input);
         const probs = softmax(logits);
-    
+
         const yIdx = output.indexOf(1);
         const probVals = probs.map(v => v.data);
         const maxProb = Math.max(...probVals)
@@ -134,50 +110,16 @@ function train(net: MLP, training: ImageItem[], lr: number) {
     net.parameters.forEach(p => p.grad = 0);
     aggLoss = aggLoss.divide(count);
     aggLoss.backward()
-    net.parameters.forEach(p => p.data += -lr*p.grad)
+    net.parameters.forEach(p => p.data += -lr * p.grad)
 
     // const avg =  aggLoss / count;
-    console.log('avgLoss:',aggLoss.data);
+    console.log('avgLoss:', aggLoss.data);
     return aggLoss.data;
 }
 
 
-function getData(startIdx: number): ImageDataSet {
-    // hacky way to ensure we're seeing all numbers consistantly in training + validation
-    const training = [];
-    const test = [];
-    for(let i = 0; i < 10; i++) {
-        const range = mnist[i].range(startIdx, startIdx + 6);
-        const y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        y[i] = 1;
-        const item = range.map(i => {
-            return {input: i, output: y }
-        })
-        training.push(item[0], item[1], item[2], item[3])
-        test.push(item[4], item[5])
-    }
-    return {
-        training,
-        test
-    };
+function getData(batchSize: number): ImageDataSet {
+    return mnist.set(batchSize, batchSize*0.25)
 }
-
-
-// async function trainTf(training: Datum[], lr: number) {
-//     const model = tf.sequential({
-//         layers: [
-//             tf.layers.dense({inputShape: [28*28], units: 10})
-//         ]
-//     })
-//     model.compile({loss: tf.losses.softMaxCrossEntropy, optimizer: 'sgd'});
-
-//     const inn = tf.tensor(training.map(t => t.input))
-//     const outt = tf.tensor(training.map(t => t.output))
-
-
-//     await model.fit(inn, outt, {epochs: 10})
-
-// }
-
 
 export default Mnist;

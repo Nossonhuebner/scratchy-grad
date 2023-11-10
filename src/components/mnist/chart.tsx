@@ -30,7 +30,7 @@ function Chart({data, label, color}: {data: number[], label: string, color: stri
       },
       title: {
         display: true,
-        text: 'Chart.js Line Chart',
+        text: label,
       },
     },
   };
@@ -49,7 +49,11 @@ function Chart({data, label, color}: {data: number[], label: string, color: stri
     ],
   };
 
-  return <Line options={options} data={chartData} />;
+  return (
+    <div className="chartWrapper">
+    <Line options={options} data={chartData} />
+    </div>
+  );
 }
 
 export default Chart;

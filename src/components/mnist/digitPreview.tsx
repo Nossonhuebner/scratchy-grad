@@ -11,19 +11,17 @@ type Props = {
 
 function topNIdx(arr: number[], n: number) {
     const copy = arr.slice(0);
-    copy.sort().reverse();
+    copy.sort((a, b) => b - a )
     const idxs: number[] = [];
-    for (let i = 0; i < Math.max(n, copy.length); i++) {
+    for (let i = 0; i < Math.min(n, copy.length); i++) {
         idxs.push(arr.indexOf(copy[i]))
     }
-
     return idxs;
 }
 
 function DigitPreview({ digit, label, preds, loss }: Props) {
     const mnistRef = useRef<HTMLCanvasElement>(null)
     const topPredIdx = preds ? topNIdx(preds, 3) : null;
-    const topPreds = topPredIdx && preds ? [preds[topPredIdx[0]], preds[topPredIdx[1]], preds[topPredIdx[2]]] : []
 
     useEffect(() => {
         if (mnistRef.current) {
@@ -35,14 +33,22 @@ function DigitPreview({ digit, label, preds, loss }: Props) {
     }, []);
 
     return (
-        <Card>
+        <Card style={{height: 'fit-content', margin: '10px'}}>
             <Stack direction="row" style={{width: 'fit-content'}}>
                 <canvas ref={mnistRef} height="28" width="28" className="digitCanvas"/>
-                <div>
-                    <div>{label}</div>
+                <div style={{width: '80px', fontSize: '12px'}}>
                     {loss && (<div>{loss}</div>)}
-                    {topPreds.map(p => {
-                        return <div>{p}</div>
+                    {preds && topPredIdx?.map(pIdx => {
+                        const color = pIdx == label ? 'green' : 'red';
+                        return (
+                            <div style={{background: `linear-gradient(90deg, ${color} 0%, rgba(255,255,255,1) ${preds[pIdx]*100}%)`}}>
+                                <Stack direction="row" justifyContent="space-between">
+                                    <strong>{pIdx}:</strong>
+                                    -
+                                    <div>{preds[pIdx].toFixed(4)}</div>
+                                </Stack>
+                            </div>
+                        )
                     })}
                 </div>
             </Stack>
