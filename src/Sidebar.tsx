@@ -4,6 +4,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
+import GhLink from './components/ghlink'
 
 const drawerWidth = 240;
 
@@ -40,6 +41,7 @@ export function Sidebar() {
             </ListItemButton>
           </ListItem>
       </List>
+      <GhLink repositoryLink="https://github.com/Nossonhuebner/scratchy-grad"/>
     </Drawer>
   );
 }

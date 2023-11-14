@@ -8,8 +8,6 @@ function App() {
       <Sidebar/>
       <div className="content">
         <Outlet />
-        {/* <LiveGrad/> */}
-          {/* <Mnist /> */}
         </div>
     </div>
   )
