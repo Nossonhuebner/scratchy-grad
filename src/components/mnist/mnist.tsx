@@ -18,31 +18,20 @@ function Mnist() {
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
     const [stepCount, setStepCount] = useState(Infinity);
-    const [dataset, setDataset] = useState<ImageDataSet | null>(null)
+    const [dataset, setDataset] = useState<ImageDataSet>({ training: [], test: [] })
     const [epocs, setEpocs] = useState(10)
     const [batchSize, setBatchSize] = useState(60)
     const [lr, setLr] = useState(0.001)
 
     useEffect(() => {
         if (stepCount < epocs) {
-            setDataset(null)
-        }
-    }, [stepCount])
-
-    useEffect(() => {
-        if (!dataset) {
             console.log(`epoc: ${stepCount}`)
             const set = getData(batchSize)
             setDataset(() => set)
             runEpoc(net, set.training, set.test, lr)
             setStepCount(cur => cur + 1)
         }
-    }, [dataset])
-
-    const triggerRun = (): void => {
-        setDataset(null)
-        setStepCount(0)
-    }
+    }, [stepCount, dataset])
 
     function runEpoc(net: MLP, training: ImageItem[], validation: ImageItem[], lr: number) {
         const l = train(net, training, lr);
@@ -57,7 +46,7 @@ function Mnist() {
             <TextField label="#Epocs" variant="outlined" type="number" value={epocs} onChange={(e) => setEpocs(parseInt(e.currentTarget.value))} />
             <TextField label="Batch size" variant="outlined" type="number" value={batchSize} onChange={(e) => setBatchSize(parseInt(e.currentTarget.value))} />
             <TextField label="Learning rate" variant="outlined" type="number" value={lr} onChange={(e) => setLr(parseFloat(e.currentTarget.value))} />
-            <Button onClick={triggerRun}>Train</Button>
+            <Button onClick={() => setStepCount(0)}>Train</Button>
 
             <Stack direction="row" className="resultsContainer">
                 <Chart data={loss} label="Loss" color="red" />
