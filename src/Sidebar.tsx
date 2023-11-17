@@ -24,19 +24,19 @@ export function Sidebar() {
     >
       <List>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to={`/scratchy-grad/`}>
+            <ListItemButton component={Link} to={`/`}>
               <ListItemText primary="Home" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton component={Link} to={`/scratchy-grad/live`}>
+            <ListItemButton component={Link} to={`live`}>
               <ListItemText primary="Live Grad" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton component={Link} to={`/scratchy-grad/mnist`}>
+            <ListItemButton component={Link} to={`mnist`}>
               <ListItemText primary="MNIST" />
             </ListItemButton>
           </ListItem>
