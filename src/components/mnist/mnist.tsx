@@ -6,7 +6,7 @@ import Chart from './chart'
 import { Value } from '../../util/engine';
 import DigitPreview from './digitPreview';
 
-type ImageItem = Datum & { loss?: number, preds?: number[] }
+type ImageItem = Datum & { loss?: number, preds?: number[], id: number }
 type ImageDataSet = {
     training: ImageItem[],
     test: ImageItem[],
@@ -52,15 +52,15 @@ function Mnist() {
                 <Chart data={loss} label="Loss" color="red" />
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
                     {dataset?.training.map(trainItem => (
-                        <DigitPreview digit={trainItem.input} label={trainItem.output.indexOf(1)} loss={trainItem.loss}/>
+                        <DigitPreview key={trainItem.id} digit={trainItem.input} label={trainItem.output.indexOf(1)} loss={trainItem.loss}/>
                     ))}
                 </div>
             </Stack>
             <Stack direction="row" className="resultsContainer">
                 <Chart data={accuracy} label="Accuracy" color="def not red lol" />
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
-                    {dataset?.test.map((testItem, idx) => (
-                        <DigitPreview key={idx} digit={testItem.input} label={testItem.output.indexOf(1)} preds={testItem.preds} />
+                    {dataset?.test.map(testItem => (
+                        <DigitPreview key={testItem.id} digit={testItem.input} label={testItem.output.indexOf(1)} preds={testItem.preds} />
                     ))}
                 </div>
             </Stack>
@@ -121,7 +121,15 @@ function train(net: MLP, training: ImageItem[], lr: number) {
 
 
 function getData(batchSize: number): ImageDataSet {
-    return mnist.set(batchSize, batchSize*0.25)
+    const set = mnist.set(batchSize, batchSize*0.25) as ImageDataSet;
+    set.training.forEach(e => {
+        e.id = Math.random() * Date.now();
+    })
+
+    set.test.forEach(e => {
+        e.id = Math.random() * Date.now();
+    })
+    return set;
 }
 
 export default Mnist;
