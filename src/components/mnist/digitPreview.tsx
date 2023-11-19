@@ -1,13 +1,7 @@
 import { Card, Stack } from '@mui/material';
 import mnist from 'mnist';
 import { useRef, useEffect } from 'react';
-
-type Props = {
-    digit: number[];
-    label: number;
-    preds?: number[];
-    loss?: number;
-}
+import { ImageItem } from './mnist'
 
 function topNIdx(arr: number[], n: number) {
     const copy = arr.slice(0);
@@ -19,7 +13,10 @@ function topNIdx(arr: number[], n: number) {
     return idxs;
 }
 
-function DigitPreview({ digit, label, preds, loss }: Props) {
+
+function DigitPreview({item}: {item: ImageItem}) {
+    const { input, output, preds, loss, id } = item;
+    const label = output.indexOf(1);
     const mnistRef = useRef<HTMLCanvasElement>(null)
     const topPredIdx = preds ? topNIdx(preds, 3) : null;
 
@@ -27,10 +24,10 @@ function DigitPreview({ digit, label, preds, loss }: Props) {
         if (mnistRef.current) {
             const context = mnistRef.current.getContext('2d')
             if (context) {
-                mnist.draw(digit, context, 0, 0);
+                mnist.draw(input, context, 0, 0);
             }
         }
-    }, []);
+    }, [input, id]);
 
     return (
         <Card style={{height: 'fit-content', margin: '10px'}}>

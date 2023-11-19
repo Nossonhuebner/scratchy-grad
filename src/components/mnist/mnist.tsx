@@ -6,7 +6,7 @@ import Chart from './chart'
 import { Value } from '../../util/engine';
 import DigitPreview from './digitPreview';
 
-type ImageItem = Datum & { loss?: number, preds?: number[], id: number }
+export type ImageItem = Datum & { loss?: number, preds?: number[], id: number }
 type ImageDataSet = {
     training: ImageItem[],
     test: ImageItem[],
@@ -52,7 +52,7 @@ function Mnist() {
                 <Chart data={loss} label="Loss" color="red" />
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
                     {dataset?.training.map(trainItem => (
-                        <DigitPreview key={trainItem.id} digit={trainItem.input} label={trainItem.output.indexOf(1)} loss={trainItem.loss}/>
+                        <DigitPreview key={trainItem.id}  item={trainItem} />
                     ))}
                 </div>
             </Stack>
@@ -60,7 +60,7 @@ function Mnist() {
                 <Chart data={accuracy} label="Accuracy" color="def not red lol" />
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
                     {dataset?.test.map(testItem => (
-                        <DigitPreview key={testItem.id} digit={testItem.input} label={testItem.output.indexOf(1)} preds={testItem.preds} />
+                        <DigitPreview key={testItem.id} item={testItem} />
                     ))}
                 </div>
             </Stack>
