@@ -107,16 +107,23 @@ function train(net: MLP, training: ImageItem[], lr: number) {
         aggLoss = aggLoss.plus(loss);
 
     })
-
     //backward
     net.parameters.forEach(p => p.grad = 0);
     aggLoss = aggLoss.divide(count);
     aggLoss.backward()
-    net.parameters.forEach(p => p.data += -lr * p.grad)
+
+    net.parameters.forEach(p => p.data += -lr * clipGradient(p.grad, -10, 10))
 
     // const avg =  aggLoss / count;
     console.log('avgLoss:', aggLoss.data);
     return aggLoss.data;
+}
+
+function clipGradient(grad: number, min: number, max: number) {
+    if (grad < min) return min;
+    if (grad > max) return max;
+    return grad;
+
 }
 
 

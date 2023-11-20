@@ -34,7 +34,7 @@ function DigitPreview({item}: {item: ImageItem}) {
             <Stack direction="row" style={{width: 'fit-content'}}>
                 <canvas ref={mnistRef} height="28" width="28" className="digitCanvas"/>
                 <div style={{width: '80px', fontSize: '12px'}}>
-                    {loss && (<div>{loss.toFixed(5)}</div>)}
+                    {loss && (<div>{loss?.toFixed(5)}</div>)}
                     {preds && topPredIdx?.map(pIdx => {
                         const color = pIdx == label ? 'green' : 'red';
                         return (
@@ -42,7 +42,7 @@ function DigitPreview({item}: {item: ImageItem}) {
                                 <Stack direction="row" justifyContent="space-between">
                                     <strong>{pIdx}:</strong>
                                     -
-                                    <div>{preds[pIdx].toFixed(4)}</div>
+                                    <div>{preds[pIdx]?.toFixed(4)}</div>
                                 </Stack>
                             </div>
                         )

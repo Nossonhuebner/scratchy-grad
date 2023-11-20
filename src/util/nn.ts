@@ -5,12 +5,13 @@ export class Neuron {
     bias: Value;
     nonLinear: boolean;
     
-    constructor(nInputs: number, nonLinear: boolean) {
+    constructor(nInputs: number, nonLinear: boolean, scale?: number) {
         this.weights  = []
         for (let i = 0; i < nInputs; i++) {
-            this.weights.push(new Value(Math.random()));
+            const val = scale ? randomNormal(0, scale) : Math.random()
+            this.weights.push(new Value(val));
         }
-        this.bias = new Value(Math.random());
+        this.bias = new Value(0);
         this.nonLinear = nonLinear;
     }
 
@@ -32,8 +33,12 @@ export class Layer {
     neurons: Neuron[];
     constructor(nInputs: number, nOutputs: number, nonLinear: boolean) {
         this.neurons = [];
+
+        const variance = 2 / (nInputs + nOutputs);
+        const scale = Math.sqrt(variance);
+
         for (let i = 0; i < nOutputs; i++) {
-            this.neurons.push(new Neuron(nInputs, nonLinear));
+            this.neurons.push(new Neuron(nInputs, nonLinear, scale));
         }   1
     }
 
@@ -86,4 +91,12 @@ export function softmax(values: Value[]) {
 
 export function negativeLogLikelihood(probs: Value[], target: number) {
     return probs[target].log().neg()
+}
+
+
+function randomNormal(mean: number, stdDev: number) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return mean + stdDev * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
