@@ -27,7 +27,7 @@ function DigitPreview({item}: {item: ImageItem}) {
                 mnist.draw(input, context, 0, 0);
             }
         }
-    }, [input, id]);
+    }, [id]);
 
     return (
         <Card style={{height: 'fit-content', margin: '10px'}}>

@@ -137,8 +137,8 @@ export function LiveGrad() {
                     </Grid>
                     <Divider/>
                     <Grid container>
-                        <Grid item xs={2}><Button disabled={!canBackProp} onClick={backprop}>Back!</Button></Grid>
-                        <Grid item xs={2}><Button disabled={nodes.length == 0} onClick={zero}>zero grad</Button></Grid>
+                        <Grid item xs={6}><Button disabled={!canBackProp} onClick={backprop}>Back!</Button></Grid>
+                        <Grid item xs={6}><Button disabled={nodes.length == 0} onClick={zero}>zero grad</Button></Grid>
                     </Grid>
                 </Card>
             </Box>
