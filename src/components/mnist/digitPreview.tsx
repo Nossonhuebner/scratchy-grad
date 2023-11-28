@@ -1,6 +1,6 @@
 import { Card, Stack } from '@mui/material';
 import mnist from 'mnist';
-import { useRef, useEffect } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import { ImageItem } from './mnist'
 
 function topNIdx(arr: number[], n: number) {
@@ -20,7 +20,7 @@ function DigitPreview({item}: {item: ImageItem}) {
     const mnistRef = useRef<HTMLCanvasElement>(null)
     const topPredIdx = preds ? topNIdx(preds, 3) : null;
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (mnistRef.current) {
             const context = mnistRef.current.getContext('2d')
             if (context) {
