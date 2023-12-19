@@ -44,23 +44,24 @@ function Mnist() {
         <div>
             <h1>Mnist</h1>
             <TextField label="#Epocs" variant="outlined" type="number" value={epocs} onChange={(e) => setEpocs(parseInt(e.currentTarget.value))} />
-            <TextField label="Batch size" variant="outlined" type="number" value={batchSize} onChange={(e) => setBatchSize(parseInt(e.currentTarget.value))} />
+            <TextField helperText="Note: 'BatchSize clips the entire dataset (it would run too slow over the complete set)" label="Batch size" variant="outlined" type="number" value={batchSize} onChange={(e) => setBatchSize(parseInt(e.currentTarget.value))} />
             <TextField label="Learning rate" variant="outlined" type="number" value={lr} onChange={(e) => setLr(parseFloat(e.currentTarget.value))} />
             <Button onClick={() => setStepCount(0)}>Train</Button>
+
+            <Stack direction="row" className="resultsContainer">
+                <Chart data={accuracy} label="Accuracy" color="def not red lol" />
+                <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
+                    {dataset?.test.map(testItem => (
+                        <DigitPreview key={testItem.id} item={testItem} />
+                    ))}
+                </div>
+            </Stack>
 
             <Stack direction="row" className="resultsContainer">
                 <Chart data={loss} label="Loss" color="red" />
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
                     {dataset?.training.map(trainItem => (
                         <DigitPreview key={trainItem.id}  item={trainItem} />
-                    ))}
-                </div>
-            </Stack>
-            <Stack direction="row" className="resultsContainer">
-                <Chart data={accuracy} label="Accuracy" color="def not red lol" />
-                <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
-                    {dataset?.test.map(testItem => (
-                        <DigitPreview key={testItem.id} item={testItem} />
                     ))}
                 </div>
             </Stack>
