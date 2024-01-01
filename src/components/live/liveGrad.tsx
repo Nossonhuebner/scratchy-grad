@@ -1,5 +1,5 @@
 import { useReducer, useState } from "react";
-import { Ops, Value } from "../../util/engine"
+import { Ops, Value } from "../../util/engine.ts"
 import {
     Stack,
     Button,

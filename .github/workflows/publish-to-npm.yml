@@ -27,8 +27,8 @@ jobs:
     - name: Change to Library Directory
       run: cd src/util
 
-    - name: Install dependencies
-      run: npm install
+    # - name: Install dependencies
+    #   run: npm install
 
     - name: Build the project
       run: npm run build # Replace with your build command specific to the library
