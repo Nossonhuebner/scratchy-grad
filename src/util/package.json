@@ -1,0 +1,12 @@
+{
+  "name": "scratchy-grad",
+  "version": "1.0.1",
+  "description": "A simple, handrolled autograd implementation package with an MLP wrapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.json"
+  },
+  "author": "nossonhuebner@gmail.com",
+  "license": "ISC"
+}
