@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "mnist.d.ts", "src/declarations.d.ts"],
+  "include": ["src", "mnist.d.ts", "src/declarations.d.ts", "index.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
