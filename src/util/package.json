@@ -1,6 +1,6 @@
 {
   "name": "scratchy-grad",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple, handrolled autograd implementation package with an MLP wrapper",
   "main": "index.js",
   "scripts": {
