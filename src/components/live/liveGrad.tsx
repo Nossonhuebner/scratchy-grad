@@ -1,5 +1,4 @@
 import { useReducer, useState } from "react";
-import { Ops, Value } from "../../util/engine.ts"
 import {
     Stack,
     Button,
@@ -14,6 +13,8 @@ import {
 import InfoIcon from '@mui/icons-material/Info';
 
 import { Graph } from "./graph";
+import { Value } from "scratchy-grad";
+import { Ops } from "scratchy-grad/engine";
 
 
 export function LiveGrad() {

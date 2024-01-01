@@ -1,10 +1,10 @@
 import mnist, { Datum } from 'mnist';
 import { useMemo, useState, useEffect } from 'react';
-import { MLP, softmax } from '../../util/nn.ts';
 import { Button, Stack, TextField } from '@mui/material';
 import Chart from './chart'
-import { Value } from '../../util/engine.ts';
 import DigitPreview from './digitPreview';
+import { MLP, softmax } from 'scratchy-grad/nn';
+import { Value } from 'scratchy-grad';
 
 export type ImageItem = Datum & { loss?: number, preds?: number[], id: number }
 type ImageDataSet = {
