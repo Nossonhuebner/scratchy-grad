@@ -24,17 +24,20 @@ jobs:
         node-version: '14' # Specify your Node.js version
         registry-url: 'https://registry.npmjs.org/'
 
-    - name: Change to Library Directory
-      run: cd src/util
-      working-directory: src/util
+    # - name: Change to Library Directory
+    #   run: cd src/util
+    #   working-directory: src/util
 
     # - name: Install dependencies
     #   run: npm install
 
     - name: Build the project
       run: npm run build # Replace with your build command specific to the library
+      working-directory: src/util
+
 
     - name: Publish to NPM
       run: npm publish
+      working-directory: src/util
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
