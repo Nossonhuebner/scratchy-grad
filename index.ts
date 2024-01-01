@@ -1,1 +1,0 @@
-export { Value, Neuron, Layer, Net, softmax, negativeLogLikelihood } from './src/util'

@@ -1,0 +1,39 @@
+name: Publish to NPM
+
+on:
+  push:
+    branches:
+      - main  # or any other branch you use for releases
+    paths:
+      - 'src/util/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/publish-to-npm.yml' # Include the workflow file to track its changes
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # Specify your Node.js version
+        registry-url: 'https://registry.npmjs.org/'
+
+    - name: Change to Library Directory
+      run: cd src/util
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the project
+      run: npm run build # Replace with your build command specific to the library
+
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
