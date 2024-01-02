@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Value = exports.Ops = void 0;
+exports.Value = exports.Ops = exports.asValue = void 0;
 function asValue(val) {
     return typeof val === 'number' ? new Value(val) : val;
 }
+exports.asValue = asValue;
 const uniqueId = (length = 16) => {
     return Math.ceil(Math.random() * Date.now()).toPrecision(length).toString().replace(".", "");
 };
@@ -78,6 +79,14 @@ class Value {
         const result = new Value(Math.max(this.data, 0), [this], Ops.ReLU);
         result._back = () => {
             this.grad += Number(result.data > 0) * result.grad;
+        };
+        return result;
+    }
+    tanh() {
+        const val = Math.tanh(this.data);
+        const result = new Value(val);
+        result._back = () => {
+            this.grad += (1 - Math.tanh(1.2) ** 2) * result.grad;
         };
         return result;
     }
