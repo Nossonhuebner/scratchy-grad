@@ -1,4 +1,4 @@
-function asValue(val: number | Value) {
+export function asValue(val: number | Value) {
     return typeof val === 'number' ? new Value(val) : val;
 }
 
@@ -71,7 +71,7 @@ export class Value {
             x.grad += this.data * result.grad;
             this.grad += x.data * result.grad;
         }
-
+ 
         return result;
     }
 
@@ -102,6 +102,17 @@ export class Value {
 
         result._back = () => {
             this.grad += Number(result.data > 0) * result.grad;
+        }
+
+        return result;
+    }
+
+    tanh() {
+        const val = Math.tanh(this.data);
+        const result = new Value(val);
+
+        result._back = () => {
+            this.grad += (1 - Math.tanh(1.2)**2) * result.grad;
         }
 
         return result;
