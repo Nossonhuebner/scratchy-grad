@@ -13,6 +13,7 @@ export enum Ops {
     Times = 'x',
     Divided = '/',
     Pow = '**',
+    Sqrt = '√',
     ReLU = 'ReLU',
     Exp = 'Exp',
     Log = 'Log',
@@ -92,6 +93,17 @@ export class Value {
 
         result._back = () => {
             this.grad += (x.data * (this.data ** (x.data-1))) * result.grad;
+        }
+
+        return result;
+    }
+
+    sqrt() {
+        const sqrt = Math.sqrt(this.data);
+        const result = new Value(sqrt, [this], Ops.Sqrt)
+
+        result._back = () => {
+            this.grad += (1 / (2 * sqrt)) * result.grad;
         }
 
         return result;
