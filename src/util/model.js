@@ -25,7 +25,7 @@ class Sequential {
     }
     forward(inputs) {
         let inns = inputs;
-        let outs = []; // fix this - was done for typing
+        let outs = [[]]; // fix this - was done for typing
         for (let i = 0; i < this.layers.length; i++) {
             outs = this.layers[i].forward(inns);
             inns = outs;

@@ -16,6 +16,7 @@ var Ops;
     Ops["Times"] = "x";
     Ops["Divided"] = "/";
     Ops["Pow"] = "**";
+    Ops["Sqrt"] = "\u221A";
     Ops["ReLU"] = "ReLU";
     Ops["Exp"] = "Exp";
     Ops["Log"] = "Log";
@@ -75,6 +76,14 @@ class Value {
         };
         return result;
     }
+    sqrt() {
+        const sqrt = Math.sqrt(this.data);
+        const result = new Value(sqrt, [this], Ops.Sqrt);
+        result._back = () => {
+            this.grad += (1 / (2 * sqrt)) * result.grad;
+        };
+        return result;
+    }
     relu() {
         const result = new Value(Math.max(this.data, 0), [this], Ops.ReLU);
         result._back = () => {
@@ -86,7 +95,7 @@ class Value {
         const val = Math.tanh(this.data);
         const result = new Value(val);
         result._back = () => {
-            this.grad += (1 - Math.tanh(1.2) ** 2) * result.grad;
+            this.grad += (1 - val ** 2) * result.grad;
         };
         return result;
     }
