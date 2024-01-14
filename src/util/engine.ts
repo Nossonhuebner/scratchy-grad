@@ -124,7 +124,7 @@ export class Value {
         const result = new Value(val);
 
         result._back = () => {
-            this.grad += (1 - Math.tanh(1.2)**2) * result.grad;
+            this.grad += (1 - val**2) * result.grad;
         }
 
         return result;
