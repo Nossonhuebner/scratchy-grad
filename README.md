@@ -1,6 +1,7 @@
 # ScratchyGrad
 (Because it's from scratch)
 #### [Live](https://nosson.me/scratchy-grad/)
+#### [NPM](https://www.npmjs.com/package/scratchy-grad)
 
 
 ## Description
@@ -16,10 +17,9 @@ This project, inspired by [Andrej Karpathy's micrograd](https://github.com/karpa
 
 
 #### TODO
-- [ ] Refactor the model API towards pytorch's (explicitly passing in layers, optimizer object...)
-- [ ] Export autograd + MLP wrapper as a package
+- [x] Refactor the model API towards pytorch's (explicitly passing in layers, optimizer object...)
+- [x] Export autograd + MLP wrapper as a package
 - Determine fix for adding more than one layer - currently multiple layers result in exploding gradients
-  - [ ] Implement Batch Normalization
-
-
-
+  - [x] Implement Batch Normalization
+  - [ ] Ensure gradients are healthy looking
+- [ ] Add Embedding layer
