@@ -58,6 +58,11 @@
   width: 50%
 }
 
+.chartWrapper canvas {
+  width: auto !important;
+  height: 289px !important;
+}
+
 .resultsContainer {
   justify-content: space-evenly;
   border: 1px solid;

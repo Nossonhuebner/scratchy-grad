@@ -3,8 +3,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import Chart from './chart'
 import DigitPreview from './digitPreview';
-import { MLP, softmax } from 'scratchy-grad/nn';
-import { Value } from 'scratchy-grad';
+import { IModel, Sequential } from 'scratchy-grad/model';
+import { IOptimizer, Linear, SGD, Value, softmax } from 'scratchy-grad';
 
 export type ImageItem = Datum & { loss?: number, preds?: number[], id: number }
 type ImageDataSet = {
@@ -13,7 +13,10 @@ type ImageDataSet = {
 }
 
 function Mnist() {
-    const net = useMemo(() => new MLP(28 * 28, [10]), []);
+    const net = useMemo(() => new Sequential([
+        new Linear(28 * 28, 10),
+    ]), []);
+    const optimizer = useMemo(() => new SGD(net.parameters, 0.001), [net]);
 
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
@@ -33,8 +36,8 @@ function Mnist() {
         }
     }, [stepCount, dataset])
 
-    function runEpoc(net: MLP, training: ImageItem[], validation: ImageItem[], lr: number) {
-        const l = train(net, training, lr);
+    function runEpoc(net: IModel, training: ImageItem[], validation: ImageItem[], lr: number) {
+        const l = train(net, optimizer, training, lr);
         const a = valid(net, validation);
         setLoss([...loss, l])
         setAccuracy([...accuracy, a])
@@ -53,6 +56,7 @@ function Mnist() {
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
                     {dataset?.test.map(testItem => (
                         <DigitPreview key={testItem.id} item={testItem} />
+
                     ))}
                 </div>
             </Stack>
@@ -70,15 +74,16 @@ function Mnist() {
 }
 
 
-function valid(net: MLP, validation: ImageItem[]) {
+function valid(net: IModel, validation: ImageItem[]) {
+    net.eval();
     const count = validation.length;
     let correct = 0;
     validation.forEach(item => {
         const { input, output } = item;
 
-        const logits = net.forward(input);
-        const probs = softmax(logits);
-
+        const logits = net.forward([input]);
+        const probs = softmax(logits[0]);
+    
         const yIdx = output.indexOf(1);
         const probVals = probs.map(v => v.data);
         const maxProb = Math.max(...probVals)
@@ -92,41 +97,32 @@ function valid(net: MLP, validation: ImageItem[]) {
 
 }
 
-function train(net: MLP, training: ImageItem[], lr: number) {
+function train(net: IModel, optimizer: IOptimizer, training: ImageItem[], lr: number) {
+    net.train();
     const count = training.length
-
     let aggLoss = new Value(0)
     training.forEach(item => {
         const { input, output } = item;
 
         // forward
-        const logits = net.forward(input);
-        const probs = softmax(logits);
+        const logits = net.forward([input]);
+        const probs = softmax(logits[0]);
 
         const loss = probs[output.indexOf(1)].negativeLogLikelihood()
         item.loss = loss.data;
         aggLoss = aggLoss.plus(loss);
 
     })
+
     //backward
+    optimizer.zeroGrad();
     net.parameters.forEach(p => p.grad = 0);
     aggLoss = aggLoss.divide(count);
     aggLoss.backward()
+    optimizer.step();
 
-    net.parameters.forEach(p => p.data += -lr * clipGradient(p.grad, -10, 10))
-
-    // const avg =  aggLoss / count;
-    console.log('avgLoss:', aggLoss.data);
     return aggLoss.data;
 }
-
-function clipGradient(grad: number, min: number, max: number) {
-    if (grad < min) return min;
-    if (grad > max) return max;
-    return grad;
-
-}
-
 
 function getData(batchSize: number): ImageDataSet {
     const set = mnist.set(batchSize, batchSize*0.25) as ImageDataSet;
