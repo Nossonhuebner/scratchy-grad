@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.negativeLogLikelihood = exports.softmax = exports.Sequential = exports.SGD = exports.BatchNorm = exports.Tanh = exports.Embedding = exports.Linear = exports.Neuron = exports.asValue = exports.Ops = exports.Value = void 0;
+exports.crossEntropyLoss = exports.negativeLogLikelihood = exports.softmax = exports.Sequential = exports.SGD = exports.BatchNorm = exports.Tanh = exports.Embedding = exports.Linear = exports.Neuron = exports.asValue = exports.Ops = exports.Value = void 0;
 var engine_1 = require("./engine");
 Object.defineProperty(exports, "Value", { enumerable: true, get: function () { return engine_1.Value; } });
 Object.defineProperty(exports, "Ops", { enumerable: true, get: function () { return engine_1.Ops; } });
@@ -19,3 +19,4 @@ Object.defineProperty(exports, "Sequential", { enumerable: true, get: function (
 var util_1 = require("./util");
 Object.defineProperty(exports, "softmax", { enumerable: true, get: function () { return util_1.softmax; } });
 Object.defineProperty(exports, "negativeLogLikelihood", { enumerable: true, get: function () { return util_1.negativeLogLikelihood; } });
+Object.defineProperty(exports, "crossEntropyLoss", { enumerable: true, get: function () { return util_1.crossEntropyLoss; } });

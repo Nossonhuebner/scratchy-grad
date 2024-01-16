@@ -37,7 +37,7 @@ function Mnist() {
     }, [stepCount, dataset])
 
     function runEpoc(net: IModel, training: ImageItem[], validation: ImageItem[], lr: number) {
-        const l = train(net, optimizer, training, lr);
+        const l = train(net, optimizer, training);
         const a = valid(net, validation);
         setLoss([...loss, l])
         setAccuracy([...accuracy, a])
@@ -97,7 +97,7 @@ function valid(net: IModel, validation: ImageItem[]) {
 
 }
 
-function train(net: IModel, optimizer: IOptimizer, training: ImageItem[], lr: number) {
+function train(net: IModel, optimizer: IOptimizer, training: ImageItem[]) {
     net.train();
     const count = training.length
     let aggLoss = new Value(0)

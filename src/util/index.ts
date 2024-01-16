@@ -1,6 +1,9 @@
 export { Value, Ops, asValue } from './engine';
 export { Neuron } from './neuron'
-export { ILayer, Linear, Embedding, Tanh, BatchNorm } from './layers'
-export { IOptimizer, SGD } from './optimizer'
-export { IModel, Sequential } from './model';
-export { softmax, negativeLogLikelihood } from './util'
+export { Linear, Embedding, Tanh, BatchNorm } from './layers'
+export { SGD } from './optimizer'
+export { Sequential } from './model';
+export type { IModel } from './model';
+export type { ILayer } from './layers';
+export type { IOptimizer } from './optimizer';
+export { softmax, negativeLogLikelihood, crossEntropyLoss } from './util'

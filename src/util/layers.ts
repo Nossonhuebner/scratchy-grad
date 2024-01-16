@@ -64,11 +64,11 @@ export class Embedding implements ILayer {
     eval () {}
     train () {}
     forward(encodedInputs: (number | Value)[][]){
-       const inns = encodedInputs as number[][];
-       const arr = new Array(this.nVocab)
+    //    const inns = encodedInputs as number[][];
+    //    const arr = new Array(this.nVocab)
        // TODO
         //    const oneHot = arr.map(e => )
-        return []
+        return encodedInputs as Value[][];
     }
     
 }
