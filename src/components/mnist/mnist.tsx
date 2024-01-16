@@ -81,8 +81,8 @@ function valid(net: IModel, validation: ImageItem[]) {
     validation.forEach(item => {
         const { input, output } = item;
 
-        const logits = net.forward([input]);
-        const probs = softmax(logits[0]);
+        const logits = net.forward([input])[0];
+        const probs = softmax([logits])[0];
     
         const yIdx = output.indexOf(1);
         const probVals = probs.map(v => v.data);
@@ -94,7 +94,6 @@ function valid(net: IModel, validation: ImageItem[]) {
     const accuracy = correct / count
     console.log('accuracy:', accuracy);
     return accuracy;
-
 }
 
 function train(net: IModel, optimizer: IOptimizer, training: ImageItem[]) {
@@ -105,8 +104,8 @@ function train(net: IModel, optimizer: IOptimizer, training: ImageItem[]) {
         const { input, output } = item;
 
         // forward
-        const logits = net.forward([input]);
-        const probs = softmax(logits[0]);
+        const logits = net.forward([input])[0];
+        const probs = softmax([logits])[0];
 
         const loss = probs[output.indexOf(1)].negativeLogLikelihood()
         item.loss = loss.data;
