@@ -31,12 +31,12 @@ function Mnist() {
             console.log(`epoc: ${stepCount}`)
             const set = getData(batchSize)
             setDataset(() => set)
-            runEpoc(net, set.training, set.test, lr)
+            runEpoc(net, set.training, set.test)
             setStepCount(cur => cur + 1)
         }
     }, [stepCount, dataset])
 
-    function runEpoc(net: IModel, training: ImageItem[], validation: ImageItem[], lr: number) {
+    function runEpoc(net: IModel, training: ImageItem[], validation: ImageItem[]) {
         const l = train(net, optimizer, training);
         const a = valid(net, validation);
         setLoss([...loss, l])
