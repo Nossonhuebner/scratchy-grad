@@ -16,6 +16,9 @@ This project, inspired by [Andrej Karpathy's micrograd](https://github.com/karpa
 - MLP for Digit Recognition: Test and visualize the performance of a neural network on the MNIST dataset.
 
 
+### Regrets
+- While React does allow some shortcuts and usage of libraries such as MUI, it was probably not the tool for this since the processing is heavy as it is without additional React overhead. In addition I had to manually disable to React batching updates since otherwise it would be "smart" and wait until the entire training process was complete to update the DOM.
+
 #### TODO
 - [x] Refactor the model API towards pytorch's (explicitly passing in layers, optimizer object...)
 - [x] Export autograd + MLP wrapper as a package

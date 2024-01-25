@@ -38,7 +38,7 @@ function DigitPreview({item}: {item: ImageItem}) {
                     {preds && topPredIdx?.map(pIdx => {
                         const color = pIdx == label ? 'green' : 'red';
                         return (
-                            <div style={{background: `linear-gradient(90deg, ${color} 0%, rgba(255,255,255,1) ${preds[pIdx]*100}%)`}}>
+                            <div key={pIdx} style={{background: `linear-gradient(90deg, ${color} 0%, rgba(255,255,255,1) ${preds[pIdx]*100}%)`}}>
                                 <Stack direction="row" justifyContent="space-between">
                                     <strong>{pIdx}:</strong>
                                     -

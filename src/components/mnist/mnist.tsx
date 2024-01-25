@@ -13,20 +13,21 @@ type ImageDataSet = {
 }
 
 function Mnist() {
-    const net = useMemo(() => new Sequential([
-        new Linear(28 * 28, 10),
-    ]), []);
-    const optimizer = useMemo(() => new SGD(net.parameters, 0.001), [net]);
-
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
     const [stepCount, setStepCount] = useState(Infinity);
     const [dataset, setDataset] = useState<ImageDataSet>({ training: [], test: [] })
     const [epocs, setEpocs] = useState(10)
     const [batchSize, setBatchSize] = useState(60)
-    const [lr, setLr] = useState(0.001)
+    const [lr, setLr] = useState<number>(0.001)
 
-    useEffect(() => {
+    const net = useMemo(() => new Sequential([
+        new Linear(28 * 28, 10),
+    ]), []);
+    const optimizer = useMemo(() => new SGD(net.parameters, lr), [net, lr]);
+
+
+    useEffect(() => { // hack to run training cycle since react was not re-rendering
         if (stepCount < epocs) {
             console.log(`epoc: ${stepCount}`)
             const set = getData(batchSize)
@@ -56,7 +57,6 @@ function Mnist() {
                 <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
                     {dataset?.test.map(testItem => (
                         <DigitPreview key={testItem.id} item={testItem} />
-
                     ))}
                 </div>
             </Stack>
@@ -73,54 +73,62 @@ function Mnist() {
     )
 }
 
-
-function valid(net: IModel, validation: ImageItem[]) {
-    net.eval();
-    const count = validation.length;
-    let correct = 0;
-    validation.forEach(item => {
-        const { input, output } = item;
-
-        const logits = net.forward([input])[0];
-        const probs = softmax([logits])[0];
-    
-        const yIdx = output.indexOf(1);
-        const probVals = probs.map(v => v.data);
-        const maxProb = Math.max(...probVals)
-        const predIdx = probVals.indexOf(maxProb);
-        item.preds = probVals;
-        correct += Number(yIdx == predIdx);
-    })
-    const accuracy = correct / count
-    console.log('accuracy:', accuracy);
-    return accuracy;
-}
-
 function train(net: IModel, optimizer: IOptimizer, training: ImageItem[]) {
     net.train();
-    const count = training.length
-    let aggLoss = new Value(0)
-    training.forEach(item => {
-        const { input, output } = item;
 
-        // forward
-        const logits = net.forward([input])[0];
-        const probs = softmax([logits])[0];
+    const ins = training.map(e => e.input)
+    const outs = training.map(e => e.output)
 
-        const loss = probs[output.indexOf(1)].negativeLogLikelihood()
-        item.loss = loss.data;
-        aggLoss = aggLoss.plus(loss);
-
+    const logt = net.forward(ins);
+    const probbs = softmax(logt);
+    const loss = probbs.map((p, i) => {
+        const l = p[outs[i].indexOf(1)].negativeLogLikelihood()
+        training[i].loss = l.data;
+        return l;
     })
+    const avgLoss = loss.reduce((a, b) => a.plus(b)).divide(training.length);
 
     //backward
     optimizer.zeroGrad();
     net.parameters.forEach(p => p.grad = 0);
-    aggLoss = aggLoss.divide(count);
-    aggLoss.backward()
+    avgLoss.backward()
     optimizer.step();
 
-    return aggLoss.data;
+    return avgLoss.data;
+}
+
+function valid(net: IModel, validation: ImageItem[]) {
+    net.eval();
+    const count = validation.length;
+    const ins = validation.map(e => e.input)
+    const outs = validation.map(e => e.output)
+
+    const logits = net.forward(ins);
+    const probs = softmax(logits);
+
+    let accuratacyCount = 0
+    probs.forEach((p, idx) => {
+        const maxProbIdx = maxIdx(p)
+        accuratacyCount += Number(outs[idx][maxProbIdx] == 1)
+        validation[idx].preds = p.map(v => v.data);
+        return maxIdx(p)
+    });
+
+    const accuracy = accuratacyCount / count
+    console.log('accuracy:', accuracy);
+    return accuracy;
+}
+
+function maxIdx(arr: Value[]) {
+    let max = arr[0].data;
+    let idx = 0;
+    arr.forEach((v, i) => {
+        if (v.data > max) {
+            max = v.data;
+            idx = i;
+        }
+    })
+    return idx;
 }
 
 function getData(batchSize: number): ImageDataSet {
