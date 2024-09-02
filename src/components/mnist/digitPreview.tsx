@@ -1,7 +1,6 @@
-import { Card, Stack } from '@mui/material';
-import mnist from 'mnist';
-import { useRef, useLayoutEffect } from 'react';
-import { ImageItem } from './mnist'
+import { Card } from '@mui/material';
+import { useRef, useEffect } from 'react';
+import { ImageItem } from './types';
 
 function topNIdx(arr: number[], n: number) {
     const copy = arr.slice(0);
@@ -13,45 +12,60 @@ function topNIdx(arr: number[], n: number) {
     return idxs;
 }
 
-
 function DigitPreview({item}: {item: ImageItem}) {
     const { input, output, preds, loss, id } = item;
     const label = output.indexOf(1);
-    const mnistRef = useRef<HTMLCanvasElement>(null)
-    const topPredIdx = preds ? topNIdx(preds, 3) : null;
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    useLayoutEffect(() => {
-        if (mnistRef.current) {
-            const context = mnistRef.current.getContext('2d')
-            if (context) {
-                mnist.draw(input, context, 0, 0);
+    useEffect(() => {
+        if (canvasRef.current) {
+            const ctx = canvasRef.current.getContext('2d');
+            if (ctx) {
+                // Draw digit
+                for (let i = 0; i < 28; i++) {
+                    for (let j = 0; j < 28; j++) {
+                        const value = input[i * 28 + j] * 255;
+                        ctx.fillStyle = `rgb(${value},${value},${value})`;
+                        ctx.fillRect(j, i, 1, 1);
+                    }
+                }
+
+                // Draw prediction bars
+                if (preds) {
+                    const maxBarWidth = 70;
+                    const barHeight = 12;
+                    topNIdx(preds, 5).forEach((pred, idx) => {
+                        const color = pred === label ? 'green' : 'red';
+                        ctx.fillStyle = color;
+                        ctx.fillRect(30, idx * (barHeight + 3), maxBarWidth * preds[pred], barHeight);
+                        ctx.fillStyle = 'black';
+                        ctx.font = '12px Arial';
+                        ctx.textAlign = 'left';
+                        ctx.fillText(`${pred}: ${preds[pred].toFixed(2)}`, 32, idx * (barHeight + 3) + 10);
+                    });
+                }
+
+                // Draw loss if available
+                if (loss !== undefined) {
+                    ctx.fillStyle = 'black';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`Loss: ${loss.toFixed(5)}`, 65, 115);
+                }
             }
         }
-    }, [id]);
+    }, [input, preds, loss, label, id]);
 
     return (
-        <Card style={{height: 'fit-content', margin: '10px'}}>
-            <Stack direction="row" style={{width: 'fit-content'}}>
-                <canvas ref={mnistRef} height="28" width="28" className="digitCanvas"/>
-                <div style={{width: '80px', fontSize: '12px'}}>
-                    {loss && (<div>{loss?.toFixed(5)}</div>)}
-                    {preds && topPredIdx?.map(pIdx => {
-                        const color = pIdx == label ? 'green' : 'red';
-                        return (
-                            <div key={pIdx} style={{background: `linear-gradient(90deg, ${color} 0%, rgba(255,255,255,1) ${preds[pIdx]*100}%)`}}>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <strong>{pIdx}:</strong>
-                                    -
-                                    <div>{preds[pIdx]?.toFixed(4)}</div>
-                                </Stack>
-                            </div>
-                        )
-                    })}
-                </div>
-            </Stack>
+        <Card style={{
+            width: 'fit-content',
+            margin: '5px',
+            padding: '2px',
+            display: 'inline-block'
+        }}>
+            <canvas ref={canvasRef} width={100} height={120} />
         </Card>
-    )
-
+    );
 }
 
 export default DigitPreview;
