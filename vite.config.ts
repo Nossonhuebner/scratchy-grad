@@ -10,8 +10,20 @@ export default defineConfig({
         // For .md files, get the raw content
         return `export default ${JSON.stringify(code)};`;
       }
+
     }
   }],
   base: '/scratchy-grad/',
+  build: {
+    rollupOptions: {
+      output: {
+        format: 'es'
+      }
+    }
+  },
+  worker: {
+    format: 'es'
+  }
   // assetsInclude: ['**/*.md']
 })
+
