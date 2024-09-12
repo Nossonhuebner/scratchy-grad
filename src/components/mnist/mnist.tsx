@@ -2,7 +2,6 @@ import { Datum } from 'mnist';
 import { useState, useEffect, useRef } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import Chart from './chart'
-import { Value } from 'scratchy-grad';
 import DigitPreview from './digitPreview';
 
 export type ImageItem = Datum & { loss?: number, preds?: number[], id: string }
@@ -14,7 +13,7 @@ type ImageDataSet = {
 function Mnist() {
     const [accuracy, setAccuracy] = useState<number[]>([]);
     const [loss, setLoss] = useState<number[]>([])
-    const [dataset, setDataset] = useState<ImageDataSet>({ training: [], test: [] })
+    const [, setDataset] = useState<ImageDataSet>({ training: [], test: [] })
     const [epocs, setEpocs] = useState(10)
     const [batchSize, setBatchSize] = useState(60)
     const [lr, setLr] = useState<number>(0.001)
