@@ -5,8 +5,9 @@ const engine_1 = require("./engine");
 class Neuron {
     constructor(nInputs, scale, bias = true) {
         this.weights = [];
+        const stdDev = scale !== null && scale !== void 0 ? scale : 1 / Math.sqrt(nInputs);
         for (let i = 0; i < nInputs; i++) {
-            this.weights.push(new engine_1.Value(createVal(scale)));
+            this.weights.push(new engine_1.Value(randomNormal(0, stdDev)));
         }
         if (bias) {
             this.bias = new engine_1.Value(0);
@@ -27,9 +28,6 @@ class Neuron {
     }
 }
 exports.Neuron = Neuron;
-function createVal(scale) {
-    return scale ? randomNormal(0, scale) : Math.random();
-}
 function randomNormal(mean, stdDev) {
     let u = 0, v = 0;
     while (u === 0)

@@ -3,11 +3,12 @@ import { Value } from "./engine";
 export class Neuron {
     weights: Value[];
     bias?: Value;
-    
+
     constructor(nInputs: number,  scale?: number, bias = true) {
         this.weights  = []
+        const stdDev = scale ?? 1 / Math.sqrt(nInputs);
         for (let i = 0; i < nInputs; i++) {
-            this.weights.push(new Value(createVal(scale)));
+            this.weights.push(new Value(randomNormal(0, stdDev)));
         }
         if (bias) {
             this.bias = new Value(0);
@@ -28,10 +29,6 @@ export class Neuron {
     get parameters() {
         return this.weights.concat(this.bias ? this.bias : []);
     }
-}
-
-function createVal(scale?: number) {
-    return scale ? randomNormal(0, scale) : Math.random();
 }
 
 function randomNormal(mean: number, stdDev: number) {

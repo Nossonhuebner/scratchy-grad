@@ -4,9 +4,11 @@ exports.BatchNorm = exports.Embedding = exports.Tanh = exports.Linear = void 0;
 const engine_1 = require("./engine");
 const neuron_1 = require("./neuron");
 class Linear {
-    constructor(nInputs, nOutputs, bias = true) {
+    constructor(nInputs, nOutputs, bias = true, init = 'glorot') {
         this.neurons = [];
-        const variance = 2 / (nInputs + nOutputs);
+        const variance = init === 'he'
+            ? 2 / nInputs
+            : 2 / (nInputs + nOutputs);
         const scale = Math.sqrt(variance);
         for (let i = 0; i < nOutputs; i++) {
             this.neurons.push(new neuron_1.Neuron(nInputs, scale, bias));

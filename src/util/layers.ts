@@ -8,12 +8,16 @@ export interface ILayer {
     train: () => void;
 }
 
+export type InitMode = 'glorot' | 'he';
+
 export class Linear implements ILayer {
     neurons: Neuron[];
-    constructor(nInputs: number, nOutputs: number, bias = true) {
+    constructor(nInputs: number, nOutputs: number, bias = true, init: InitMode = 'glorot') {
         this.neurons = [];
 
-        const variance = 2 / (nInputs + nOutputs);
+        const variance = init === 'he'
+            ? 2 / nInputs
+            : 2 / (nInputs + nOutputs);
         const scale = Math.sqrt(variance);
 
         for (let i = 0; i < nOutputs; i++) {
