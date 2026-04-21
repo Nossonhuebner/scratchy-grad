@@ -26,3 +26,10 @@ This project, inspired by [Andrej Karpathy's micrograd](https://github.com/karpa
   - [x] Implement Batch Normalization
   - [ ] Ensure gradients are healthy looking
 - [ ] Add Embedding layer
+
+
+## Appendix: LLM-assisted follow-ups
+
+A log of changes worked through with Claude Code, linked to the commit that landed them.
+
+- [`6281ea9`](https://github.com/Nossonhuebner/scratchy-grad/commit/6281ea98990bf6f093c5475c6016b7287c277a44) — **Fan-in-aware weight init + first test suite.** Replaced `Neuron`'s uniform `Math.random()` fallback with a Gaussian fan-in-aware default (`N(0, 1/√fan_in)`), and added an optional `'he'` init mode to `Linear` for ReLU-friendly deeper nets. Set up vitest and added tests checking that the empirical stddev of sampled weights matches the theoretical target across Glorot, He, and explicit-scale paths.
